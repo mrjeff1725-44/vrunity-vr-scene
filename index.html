@@ -42,7 +42,7 @@ function init() {
   console.error = function() { try { parent.postMessage({ type: 'vrunity-log', sev: 'error', msg: Array.from(arguments).map(String).join(' ') }, '*'); } catch (e) {} _origErr.apply(console, arguments); };
   window.addEventListener('error', (e) => { try { parent.postMessage({ type: 'vrunity-log', sev: 'error', msg: e.message }, '*'); } catch (x) {} });
 
-  const DATA = [{"id":"go0mou","name":"Ground","type":"plane","color":"#6b6665","position":[0,0,0],"rotation":[-1.5707963267948966,0,0],"scale":[10,10,1],"parentId":null,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go1mou","name":"Directional Light","type":"light","color":"#ffffff","position":[4,6,3],"rotation":[-1.05,0.52,0],"scale":[1,1,1],"parentId":null,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"intensity":1.3,"range":50,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go2mou","name":"VR Rig","type":"group","color":"#4C97FF","position":[0,0,0],"rotation":[0,0,0],"scale":[1,1,1],"parentId":null,"vrRole":"rig","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go6mou","name":"Head","type":"sphere","color":"#4fe0e0","position":[0,1.6,0],"rotation":[0,0,0],"scale":[0.14,0.16,0.14],"parentId":"go2mou","vrRole":"head","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go7mou","name":"Body","type":"cylinder","color":"#5a5a5a","position":[0,1,0],"rotation":[0,0,0],"scale":[0.22,0.55,0.22],"parentId":"go2mou","vrRole":"body","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go3mou","name":"Left Hand","type":"group","color":"#4fa3e8","position":[-0.35,1.2,-0.3],"rotation":[0,0,0],"scale":[1,1,1],"parentId":"go2mou","vrRole":"leftHand","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go4mou","name":"Right Hand","type":"group","color":"#4fa3e8","position":[0.35,1.2,-0.3],"rotation":[0,0,0],"scale":[1,1,1],"parentId":"go2mou","vrRole":"rightHand","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}}];
+  const DATA = [{"id":"go0df5","name":"Ground","type":"plane","color":"#6b6665","position":[0,0,0],"rotation":[-1.5707963267948966,0,0],"scale":[10,10,1],"parentId":null,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go1df5","name":"Directional Light","type":"light","color":"#ffffff","position":[4,6,3],"rotation":[-1.05,0.52,0],"scale":[1,1,1],"parentId":null,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"intensity":1.3,"range":50,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go2df5","name":"VR Rig","type":"group","color":"#4C97FF","position":[0,0,0],"rotation":[0,0,0],"scale":[1,1,1],"parentId":null,"vrRole":"rig","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go6df5","name":"Head","type":"sphere","color":"#4fe0e0","position":[0,1.6,0],"rotation":[0,0,0],"scale":[0.14,0.16,0.14],"parentId":"go2df5","vrRole":"head","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go7df6","name":"Body","type":"cylinder","color":"#5a5a5a","position":[0,1,0],"rotation":[0,0,0],"scale":[0.22,0.55,0.22],"parentId":"go2df5","vrRole":"body","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go3df5","name":"Left Hand","type":"group","color":"#4fa3e8","position":[-0.35,1.2,-0.3],"rotation":[0,0,0],"scale":[1,1,1],"parentId":"go2df5","vrRole":"leftHand","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go4df5","name":"Right Hand","type":"group","color":"#4fa3e8","position":[0.35,1.2,-0.3],"rotation":[0,0,0],"scale":[1,1,1],"parentId":"go2df5","vrRole":"rightHand","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}}];
   const SCRIPTS = [];
   const SKY = {"type":"procedural","topColor":"#1a5fa0","horizonColor":"#b0d0ee","sunDir":[0.3,0.8,0.2],"sunColor":"#fff8e0","sunSize":0.02,"starDensity":0,"hazeStrength":0.25,"sunGlow":1};
   const WORLD = {"gravity":true,"gravityStrength":9.8,"gravityPlayers":true,"gravityObjects":true,"density":1,"collision":true,"shadows":true,"ambientIntensity":0.35,"worldLight":true,"worldLightIntensity":1,"worldLightColor":"#ffffff","fog":false,"fogColor":"#9e9e9e","fogNear":10,"fogFar":60,"mpEnabled":false,"mpMaxPlayers":8,"mpPrivateCodes":false,"mpPortalObjectId":null,"mpPortalLeaveId":null,"mpPortalJoinPublicId":null,"mpPortalAssets":false,"mpMicrophone":false,"mpPushToTalk":false};
@@ -56,9 +56,9 @@ function init() {
   } else {
     camera.position.set(0, 1.6, 5);
   }
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  const renderer = new THREE.WebGLRenderer({ antialias: false });
   renderer.setSize(innerWidth, innerHeight);
-  renderer.setPixelRatio(devicePixelRatio);
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.25));
   renderer.shadowMap.enabled = (WORLD && WORLD.shadows !== false);
   const RTX = !!(WORLD && WORLD.rtx === true);
   renderer.shadowMap.type = RTX ? THREE.VSMShadowMap : THREE.PCFSoftShadowMap;
@@ -121,7 +121,7 @@ function init() {
   scene.add(new THREE.HemisphereLight(0xbcd6f0, 0x303030, (WORLD && WORLD.ambientIntensity != null ? WORLD.ambientIntensity : 0.1)));
   const dirLights = [];
   const dir = new THREE.DirectionalLight(0xffffff, 1.2); dir.position.set(5, 8, 5); dir.castShadow = true;
-  dir.shadow.mapSize.set(RTX ? 4096 : 2048, RTX ? 4096 : 2048);
+  dir.shadow.mapSize.set(1024, 1024);
   dir.shadow.camera.near = 0.5; dir.shadow.camera.far = 200;
   dir.shadow.bias = -0.0005; dir.shadow.normalBias = 0.02;
   scene.add(dir);
@@ -152,7 +152,7 @@ function init() {
       m = new THREE.Group();
       const l = new THREE.DirectionalLight(o.color || 0xffffff, o.intensity ?? 1.3);
       l.castShadow = true;
-      l.shadow.mapSize.set(2048, 2048);
+      l.shadow.mapSize.set(1024, 1024);
       const r = o.range ?? 50;
       l.shadow.camera.near = 0.5;
       l.shadow.camera.far = Math.max(200, r * 4);
@@ -995,36 +995,145 @@ function init() {
     }
   });
 
-  btn.onclick = async () => {
-    if (navigator.xr) {
-      try {
-        const s = await navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor'] });
-        await renderer.xr.setSession(s);
-        vrActive = true; btn.style.display = 'none'; exitBtn.style.display = 'block';
-        if (rigObj) {
-          const base = renderer.xr.getReferenceSpace();
-          const euler = new THREE.Euler(rigObj.rotation[0] || 0, 0, rigObj.rotation[2] || 0, 'XYZ');
-          const q = new THREE.Quaternion().setFromEuler(euler);
-          const pose = new XRRigidTransform({ x: rigObj.position[0] || 0, y: rigObj.position[1] || 0, z: rigObj.position[2] || 0 }, { x: q.x, y: q.y, z: q.z, w: q.w });
-          renderer.xr.setReferenceSpace(base.getOffsetReferenceSpace(pose));
-        }
-        ['head', 'body', 'leftHand', 'rightHand'].forEach(function(role) { if (rig[role]) scene.attach(rig[role]); });
-        return;
-      } catch (e) { /* fall through to stereo */ }
-    }
-    vrActive = true; btn.style.display = 'none'; exitBtn.style.display = 'block';
-    try { if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); } catch (e) {}
-    try { if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape'); } catch (e) {}
-  };
-
-  // Auto-enter stereoscopic VR on load for non-WebXR devices (e.g. Cardboard APK).
-  if (!navigator.xr) {
-    vrActive = true; btn.style.display = 'none'; exitBtn.style.display = 'block';
-    const tryFs = () => { try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } catch (e) {} try { screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape'); } catch (e) {} removeEventListener('touchend', tryFs); removeEventListener('click', tryFs); };
-    addEventListener('touchend', tryFs); addEventListener('click', tryFs);
-  }
-
-  addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+  (function configureWebSceneVr({ THREE, renderer, scene, rig, rigObj, btn, exitBtn, autoEnter, onSessionChange, onError }) {
+	let session = null, requesting = false, supported = null, gestureArmed = true;
+	const parts = [
+		"head",
+		"body",
+		"leftHand",
+		"rightHand"
+	].map((role) => rig[role]).filter(Boolean).map((node) => ({
+		node,
+		parent: node.parent,
+		position: node.position.clone(),
+		quaternion: node.quaternion.clone(),
+		scale: node.scale.clone()
+	}));
+	const restore = () => {
+		parts.forEach(({ node, parent, position, quaternion, scale }) => {
+			if (parent) parent.add(node);
+			node.position.copy(position);
+			node.quaternion.copy(quaternion);
+			node.scale.copy(scale);
+		});
+		onSessionChange(false);
+		btn.disabled = false;
+		btn.style.display = "block";
+		btn.textContent = "Enter VR";
+		exitBtn.style.display = "none";
+	};
+	const disarm = () => {
+		gestureArmed = false;
+		window.removeEventListener("click", firstGesture);
+		window.removeEventListener("keydown", firstGesture);
+	};
+	async function enterVR(automatic = false) {
+		if (requesting || session || supported === false || !navigator.xr) return;
+		if (!automatic) disarm();
+		requesting = true;
+		btn.disabled = true;
+		btn.textContent = "Starting VR…";
+		let created = null, ended = false;
+		try {
+			// Call before any await so a tap's user activation is preserved.
+			created = await navigator.xr.requestSession("immersive-vr", { requiredFeatures: ["local-floor"] });
+			session = created;
+			created.addEventListener("end", () => {
+				ended = true;
+				if (session === created) {
+					session = null;
+					restore();
+				}
+			}, { once: true });
+			await renderer.xr.setSession(created);
+			if (ended) return;
+			const base = renderer.xr.getReferenceSpace();
+			if (rigObj && base) {
+				const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, rigObj.rotation?.[1] || 0, 0)).invert();
+				const p = new THREE.Vector3().fromArray(rigObj.position || [
+					0,
+					0,
+					0
+				]).applyQuaternion(q).negate();
+				renderer.xr.setReferenceSpace(base.getOffsetReferenceSpace(new XRRigidTransform({
+					x: p.x,
+					y: p.y,
+					z: p.z
+				}, {
+					x: q.x,
+					y: q.y,
+					z: q.z,
+					w: q.w
+				})));
+			}
+			parts.forEach(({ node }) => scene.attach(node));
+			disarm();
+			onSessionChange(true);
+			btn.style.display = "none";
+			exitBtn.style.display = "block";
+		} catch (error) {
+			// Release a partially initialized session; never disguise a failure as stereo VR.
+			if (created && !ended) {
+				try {
+					await created.end();
+				} catch (endError) {
+					onError(endError);
+				}
+			}
+			if (session === created) session = null;
+			restore();
+			if (automatic && ["SecurityError", "NotAllowedError"].includes(error.name)) btn.textContent = "Tap to enter VR";
+			else onError("Could not enter VR: " + (error.message || error));
+		} finally {
+			requesting = false;
+			btn.disabled = supported === false;
+		}
+	}
+	function firstGesture(event) {
+		if (!gestureArmed || event.target === exitBtn || requesting || session || supported !== true) return;
+		if (event.type === "keydown" && !["Enter", " "].includes(event.key)) return;
+		enterVR(false);
+	}
+	btn.onclick = () => enterVR(false);
+	exitBtn.onclick = async (event) => {
+		event.stopPropagation();
+		if (session) {
+			try {
+				await session.end();
+			} catch (error) {
+				onError("Could not leave VR: " + error.message);
+			}
+		}
+	};
+	if (!navigator.xr || !window.isSecureContext) {
+		supported = false;
+		btn.disabled = true;
+		btn.textContent = "VR requires a headset browser";
+		return;
+	}
+	renderer.xr.setReferenceSpaceType("local-floor");
+	// Lower XR framebuffer cost without resizing the canvas during a live session.
+	renderer.xr.setFramebufferScaleFactor(.85);
+	renderer.xr.setFoveation(1);
+	if (autoEnter) {
+		window.addEventListener("click", firstGesture);
+		window.addEventListener("keydown", firstGesture);
+	}
+	btn.textContent = "Checking VR…";
+	navigator.xr.isSessionSupported("immersive-vr").then((ok) => {
+		supported = ok;
+		btn.disabled = !ok;
+		btn.textContent = ok ? "Enter VR" : "VR not supported";
+		if (ok && autoEnter) enterVR(true);
+	}).catch((error) => {
+		btn.textContent = "Enter VR";
+		onError("Could not check VR: " + error.message);
+	});
+})({ THREE, renderer, scene, rig, rigObj, btn, exitBtn, autoEnter: true, onSessionChange: function(value) { vrActive = value; }, onError: showSceneError });
+  addEventListener('resize', () => {
+    if (renderer.xr.isPresenting) return;
+    camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight);
+  });
 }
 if (typeof THREE !== 'undefined') startScene();
 </script>
