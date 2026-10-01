@@ -614,6 +614,7 @@ function init() {
   const World = WORLD || {};
   // ---- Game Systems (procedural, AI, pathfinding, particles, etc.) ----
   // ---- Game Systems (procedural, AI, pathfinding, particles, etc.) ----
+  // ---- Game Systems (procedural, AI, pathfinding, particles, etc.) ----
   
   // ---- Game Systems ----
   var Procedural = {
@@ -670,6 +671,8 @@ function init() {
   Object.defineProperty(DayNight,'sunDirection',{get:function(){var a=(DayNight.time-6)/12*Math.PI;return [Math.cos(a),Math.sin(a),0.3];}});
   Object.defineProperty(DayNight,'sunIntensity',{get:function(){var h=DayNight.time;if(h<5||h>19)return 0;if(h<7)return (h-5)/2;if(h>17)return (19-h)/2;return 1;}});
 
+
+  
 
   
 
@@ -911,7 +914,7 @@ function init() {
   const hands = [input.leftHand, input.rightHand];
   const v = new THREE.Vector3(), q = new THREE.Quaternion(), oldQ = new THREE.Quaternion();
   const pressed = button => Boolean(button?.pressed || (button?.value || 0) > 0.1);
-  const gestures = new WeakMap();
+  let gestures = new WeakMap();
   let observedSession = null;
   const gesture = event => {
     if (!event.inputSource) return;
@@ -956,7 +959,7 @@ function init() {
   };
   const reset = () => {
     input.present = false; input.head.tracked = false;
-    observe(null);
+    if (observedSession) { observe(null); gestures = new WeakMap(); }
     hands.forEach(hand => { buttons(hand, null); hand.connected = false; hand.tracked = false; hand.rayTracked = false; hand._lastPos = null; hand._lastRotation = null; hand.velocity = [0, 0, 0]; hand.angularVelocity = [0, 0, 0]; });
   };
   const sample = (dt, frame, sampleButtons) => {
@@ -1006,13 +1009,14 @@ function init() {
     return { hand: side === 'left' ? input.leftHand : input.rightHand, button: button === 'thumbstick' ? 'thumbstickDown' : button };
   };
   const down = key => { const b = binding(key); return b.hand.tracked && !!b.hand[b.button]; };
-  const hits = (point, dir, distance) => { scene.updateMatrixWorld(true); ray.set(point, dir); ray.far = distance; return ray.intersectObjects(targets, true); };
+  const hits = (point, dir, distance) => { ray.set(point, dir); ray.far = distance; return ray.intersectObjects(targets, true); };
   const reset = () => { base = null; speed = velY = 0; armed = true; prevJump = prevSprint = sprintToggle = wasAiming = false; destination = null; if (line) line.visible = false; if (ring) ring.visible = false; };
   const update = (dt, frame) => {
     if (!base || !rigObj || !input.present || !frame) return;
     const p = rigObj.position, r = rigObj.rotation;
     const rawViewer = frame.getViewerPose(base);
     if (!rawViewer) return;
+    scene.updateMatrixWorld(true);
     const raw = rawViewer.transform.position;
     const turnHand = rigObj.turnInput === 'left' ? input.leftHand : input.rightHand;
     const turnX = turnHand.tracked ? turnHand.thumbstick[0] : 0;
@@ -1029,6 +1033,7 @@ function init() {
     }
     if (rigObj.locomotion === 'walk') {
       const hand = rigObj.turnInput === 'left' ? input.rightHand : input.leftHand;
+      if (!hand.tracked) speed = 0;
       const x = hand.tracked ? hand.thumbstick[0] : 0, y = hand.tracked ? hand.thumbstick[1] : 0;
       const magnitude = Math.min(1, Math.hypot(x, y));
       const sprintButton = down(rigObj.sprintInput || 'left-thumbstick');
@@ -1084,7 +1089,10 @@ function init() {
       const aiming = hand.tracked && hand.rayTracked && !!hand[selected.button];
       if (aiming) {
         if (!line) {
-          line = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: rigObj.teleportLineColor || '#00ffff' }));
+          const geometry = new THREE.BufferGeometry();
+          geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(25 * 3), 3));
+          line = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: rigObj.teleportLineColor || '#00ffff' }));
+          line.frustumCulled = false;
           ring = new THREE.Mesh(new THREE.RingGeometry(0.18, 0.23, 24), new THREE.MeshBasicMaterial({ color: rigObj.teleportRingColor || '#00ffff', side: THREE.DoubleSide }));
           ring.rotation.x = -Math.PI / 2; scene.add(line, ring);
         }
@@ -1104,10 +1112,12 @@ function init() {
           }
           points.push(next.clone());
         }
-        line.geometry.setFromPoints(points); line.visible = true; ring.visible = !!destination;
+        points.forEach((point, index) => line.geometry.attributes.position.setXYZ(index, point.x, point.y, point.z));
+        line.geometry.attributes.position.needsUpdate = true; line.geometry.setDrawRange(0, points.length);
+        line.visible = true; ring.visible = !!destination;
         if (destination) ring.position.copy(destination).add(new THREE.Vector3(0, 0.015, 0));
       } else {
-        if (wasAiming && destination && hand.connected) {
+        if (wasAiming && destination && hand.connected && hand.tracked && hand.rayTracked) {
           p[0] = destination.x - (Math.cos(r[1]) * raw.x + Math.sin(r[1]) * raw.z);
           p[1] = destination.y; p[2] = destination.z - (-Math.sin(r[1]) * raw.x + Math.cos(r[1]) * raw.z); velY = 0;
         }
@@ -1327,7 +1337,7 @@ function init() {
   gateBtn.onclick = () => enterVR(false);
   window.addEventListener('click', firstGesture);
   window.addEventListener('keydown', firstGesture);
-  window.addEventListener('touchstart', firstGesture, { passive: true });
+  window.addEventListener('touchend', firstGesture, { passive: true });
 
   exitBtn.onclick = async event => {
     event.stopPropagation();
