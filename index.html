@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>VR Scene</title>
+
+<style> html,body { margin:0; height:100%; background:#0a0c12; overflow:hidden; font-family: ui-monospace, monospace; } canvas { display:block; } </style>
+</head>
+<body>
+<script src="three.min.js" onerror="this.onerror=null;var d=document.createElement('script');d.src='https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.min.js';d.onload=init;document.body.appendChild(d);"></script>
+<script>
+function init() {
+  if (typeof THREE === 'undefined') return;
+  const _origErr = console.error;
+  console.error = function() { try { parent.postMessage({ type: 'vrunity-log', sev: 'error', msg: Array.from(arguments).map(String).join(' ') }, '*'); } catch (e) {} _origErr.apply(console, arguments); };
+  window.addEventListener('error', (e) => { try { parent.postMessage({ type: 'vrunity-log', sev: 'error', msg: e.message }, '*'); } catch (x) {} });
+
+  const DATA = [{"id":"go01nd","name":"Ground","type":"plane","color":"#6b6665","position":[0,0,0],"rotation":[-1.5707963267948966,0,0],"scale":[10,10,1],"parentId":null,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go11nd","name":"Directional Light","type":"light","color":"#ffffff","position":[4,6,3],"rotation":[-1.05,0.52,0],"scale":[1,1,1],"parentId":null,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"intensity":1.3,"range":50,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go21nd","name":"VR Rig","type":"group","color":"#4C97FF","position":[0,0,0],"rotation":[0,0,0],"scale":[1,1,1],"parentId":null,"vrRole":"rig","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go61nd","name":"Head","type":"sphere","color":"#4fe0e0","position":[0,1.6,0],"rotation":[0,0,0],"scale":[0.14,0.16,0.14],"parentId":"go21nd","vrRole":"head","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go71nd","name":"Body","type":"cylinder","color":"#5a5a5a","position":[0,1,0],"rotation":[0,0,0],"scale":[0.22,0.55,0.22],"parentId":"go21nd","vrRole":"body","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go31nd","name":"Left Hand","type":"group","color":"#4fa3e8","position":[-0.35,1.2,-0.3],"rotation":[0,0,0],"scale":[1,1,1],"parentId":"go21nd","vrRole":"leftHand","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go41nd","name":"Right Hand","type":"group","color":"#4fa3e8","position":[0.35,1.2,-0.3],"rotation":[0,0,0],"scale":[1,1,1],"parentId":"go21nd","vrRole":"rightHand","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}}];
+  const SCRIPTS = [];
+  const SKY = {"type":"procedural","topColor":"#1a5fa0","horizonColor":"#b0d0ee","sunDir":[0.3,0.8,0.2],"sunColor":"#fff8e0","sunSize":0.02,"starDensity":0,"hazeStrength":0.25,"sunGlow":1};
+  const WORLD = {"gravity":true,"gravityStrength":9.8,"gravityPlayers":true,"gravityObjects":true,"density":1,"collision":true,"shadows":true,"ambientIntensity":0.35,"worldLight":true,"worldLightIntensity":1,"worldLightColor":"#ffffff","fog":false,"fogColor":"#9e9e9e","fogNear":10,"fogFar":60,"mpEnabled":false,"mpMaxPlayers":8,"mpPrivateCodes":false,"mpPortalObjectId":null,"mpPortalLeaveId":null,"mpPortalJoinPublicId":null,"mpPortalAssets":false,"mpMicrophone":false,"mpPushToTalk":false};
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 20000);
+  const rigObj = DATA.find((o) => o.vrRole === 'rig');
+  const rigYaw = rigObj ? (rigObj.rotation[1] || 0) : 0;
+  if (rigObj) {
+    camera.position.set(rigObj.position[0] || 0, (rigObj.position[1] || 0) + 1.6, rigObj.position[2] || 0);
+  } else {
+    camera.position.set(0, 1.6, 5);
+  }
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(devicePixelRatio);
+  renderer.shadowMap.enabled = (WORLD && WORLD.shadows !== false);
+  const RTX = !!(WORLD && WORLD.rtx === true);
+  renderer.shadowMap.type = RTX ? THREE.VSMShadowMap : THREE.PCFSoftShadowMap;
+  if (RTX) { renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.15; }
+  renderer.xr.enabled = true;
+  document.body.appendChild(renderer.domElement);
+
+  // RTX image-based lighting reflections from a sky-colored gradient environment.
+  if (RTX) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 16; canvas.height = 16;
+    const ctx = canvas.getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, 0, 16);
+    grad.addColorStop(0, (SKY && SKY.topColor) || '#1a5fa0');
+    grad.addColorStop(0.5, (SKY && SKY.horizonColor) || '#b0d0ee');
+    grad.addColorStop(1, '#1a1a1a');
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, 16, 16);
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromEquirectangular(tex).texture;
+    tex.dispose(); pmrem.dispose();
+  }
+
+  // ---- Skysphere (sphere with equirectangular shader sampling) ----
+  let skyMesh = null;
+  function applySky(sky) {
+    if (skyMesh) { scene.remove(skyMesh); const _t = skyMesh.material.map || (skyMesh.material.uniforms && skyMesh.material.uniforms.envMap && skyMesh.material.uniforms.envMap.value); if (_t) _t.dispose(); skyMesh.material.dispose(); skyMesh.geometry.dispose(); skyMesh = null; }
+    if (!sky || sky.type === 'none') { scene.background = new THREE.Color(0x0a0c12); return; }
+    scene.background = null;
+    const geo = new THREE.SphereGeometry(8000, 64, 32);
+    let mat;
+    if (sky.type === 'procedural') {
+      mat = new THREE.ShaderMaterial({
+        uniforms: {
+          topColor: { value: new THREE.Color(sky.topColor || '#1a5fa0') },
+          horizonColor: { value: new THREE.Color(sky.horizonColor || '#b0d0ee') },
+          sunDir: { value: new THREE.Vector3().fromArray(sky.sunDir || [0.3, 0.8, 0.2]) },
+          sunColor: { value: new THREE.Color(sky.sunColor || '#fff8e0') },
+          sunSize: { value: sky.sunSize || 0.02 }
+        },
+        vertexShader: 'varying vec3 vDir;void main(){vDir=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+        fragmentShader: 'varying vec3 vDir;uniform vec3 topColor;uniform vec3 horizonColor;uniform vec3 sunDir;uniform vec3 sunColor;uniform float sunSize;void main(){vec3 d=normalize(vDir);float h=d.y;vec3 skyCol=mix(horizonColor,topColor,pow(max(h,0.0),0.5));vec3 groundCol=horizonColor*0.35;vec3 col=mix(groundCol,skyCol,smoothstep(-0.1,0.0,h));vec3 sd=normalize(sunDir);float sDot=max(dot(d,sd),0.0);float sun=smoothstep(1.0-sunSize,1.0-sunSize*0.3,sDot);float glow=pow(sDot,32.0)*0.5;float halo=pow(sDot,4.0)*0.15;col+=sunColor*(sun+glow+halo);gl_FragColor=vec4(pow(col,vec3(1.0/2.2)),1.0);}',
+        side: THREE.BackSide, depthWrite: false
+      });
+    } else if (sky.type === 'image' && sky.url) {
+      const tex = new THREE.TextureLoader().load(sky.url);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.wrapS = THREE.RepeatWrapping;
+      mat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, depthWrite: false });
+    } else {
+      mat = new THREE.MeshBasicMaterial({ color: sky.color || '#7D9CC1', side: THREE.BackSide, depthWrite: false });
+    }
+    skyMesh = new THREE.Mesh(geo, mat);
+    skyMesh.frustumCulled = false;
+    scene.add(skyMesh);
+  }
+  applySky(SKY);
+
+  scene.add(new THREE.HemisphereLight(0xbcd6f0, 0x303030, (WORLD && WORLD.ambientIntensity != null ? WORLD.ambientIntensity : 0.1)));
+  const dirLights = [];
+  const dir = new THREE.DirectionalLight(0xffffff, 1.2); dir.position.set(5, 8, 5); dir.castShadow = true;
+  dir.shadow.mapSize.set(RTX ? 4096 : 2048, RTX ? 4096 : 2048);
+  dir.shadow.camera.near = 0.5; dir.shadow.camera.far = 200;
+  dir.shadow.bias = -0.0005; dir.shadow.normalBias = 0.02;
+  scene.add(dir);
+  dirLights.push(dir);
+
+  const GEO = {
+    cube: new THREE.BoxGeometry(1, 1, 1),
+    sphere: new THREE.SphereGeometry(0.5, 32, 32),
+    cylinder: new THREE.CylinderGeometry(0.5, 0.5, 1, 32),
+    cone: new THREE.ConeGeometry(0.5, 1, 32),
+    plane: new THREE.PlaneGeometry(1, 1),
+  };
+  const texLoader = new THREE.TextureLoader();
+  const meshes = {};
+  DATA.forEach((o) => {
+    let m = null;
+    if (['cube', 'sphere', 'cylinder', 'plane', 'cone'].includes(o.type)) {
+      const mat = new THREE.MeshStandardMaterial({ color: o.color || '#888888', roughness: 0.6, side: o.type === 'plane' ? THREE.DoubleSide : THREE.FrontSide });
+      if (o.textureUrl) {
+        const tex = texLoader.load(o.textureUrl);
+        const rep = Math.max(1, o.textureRepeat || 1);
+        tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(rep, rep);
+        mat.map = tex;
+      }
+      m = new THREE.Mesh(GEO[o.type], mat);
+      m.castShadow = true; m.receiveShadow = true;
+    } else if (o.type === 'light') {
+      m = new THREE.Group();
+      const l = new THREE.DirectionalLight(o.color || 0xffffff, o.intensity ?? 1.3);
+      l.castShadow = true;
+      l.shadow.mapSize.set(2048, 2048);
+      const r = o.range ?? 50;
+      l.shadow.camera.near = 0.5;
+      l.shadow.camera.far = Math.max(200, r * 4);
+      l.shadow.camera.left = -r; l.shadow.camera.right = r;
+      l.shadow.camera.top = r; l.shadow.camera.bottom = -r;
+      l.shadow.bias = -0.0005; l.shadow.normalBias = 0.02;
+      const target = new THREE.Object3D(); target.position.set(0, 0, -5);
+      m.add(target); l.target = target; m.add(l);
+      dirLights.push(l);
+    } else if (o.type === 'audio') {
+      m = null; // audio is invisible in-game
+    } else {
+      m = new THREE.Group();
+    }
+    if (m) {
+      m.position.fromArray(o.position || [0, 0, 0]);
+      m.rotation.fromArray(o.rotation || [0, 0, 0]);
+      m.scale.fromArray(o.scale || [1, 1, 1]);
+      scene.add(m); meshes[o.id] = m;
+    }
+  });
+
+  DATA.forEach((o) => { if (o.parentId && meshes[o.parentId] && meshes[o.id]) { meshes[o.parentId].add(meshes[o.id]); } });
+
+  // Auto-fit directional light shadow cameras to cover the whole scene.
+  (function() {
+    var sbox = new THREE.Box3();
+    DATA.forEach(function(o) {
+      var m = meshes[o.id];
+      if (!m || o.type === 'light' || o.type === 'camera' || o.type === 'audio') return;
+      var b = new THREE.Box3().setFromObject(m);
+      if (!b.isEmpty()) sbox.union(b);
+    });
+    if (!sbox.isEmpty()) {
+      var sz = sbox.getSize(new THREE.Vector3());
+      var r = Math.max(sz.x, sz.y, sz.z) * 0.5 + 10;
+      dirLights.forEach(function(l) {
+        l.shadow.camera.left = -r; l.shadow.camera.right = r;
+        l.shadow.camera.top = r; l.shadow.camera.bottom = -r;
+        l.shadow.camera.far = Math.max(500, r * 4 + 200);
+        l.shadow.camera.updateProjectionMatrix();
+      });
+    }
+  })();
+
+  var audioElements = {};
+  DATA.forEach(function(o) {
+    if (o.type === 'audio' && o.audioUrl) { try { var a = new Audio(o.audioUrl); a.loop = o.audioLoop !== false; audioElements[o.id] = a; a.play(); } catch (e) {} }
+  });
+  var findAudio = function(name) { var o = DATA.find(function(x) { return x.name === name && x.type === 'audio'; }); return o && audioElements[o.id] ? audioElements[o.id] : null; };
+  var Audio = {
+    play: function(name) { var a = findAudio(name); if (a) { try { a.play(); } catch(e) {} } },
+    stop: function(name) { var a = findAudio(name); if (a) { a.pause(); a.currentTime = 0; } },
+    pause: function(name) { var a = findAudio(name); if (a) a.pause(); },
+    setVolume: function(name, vol) { var a = findAudio(name); if (a) a.volume = Math.max(0, Math.min(1, vol)); },
+    setLoop: function(name, loop) { var a = findAudio(name); if (a) a.loop = !!loop; },
+  };
+
+  const Vector3 = {
+    up: [0, 1, 0], down: [0, -1, 0], left: [-1, 0, 0], right: [1, 0, 0],
+    forward: [0, 0, 1], back: [0, 0, -1], zero: [0, 0, 0], one: [1, 1, 1],
+    lerp: (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t],
+    Lerp: (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t],
+    add: (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]],
+    sub: (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]],
+    scale: (a, s) => [a[0] * s, a[1] * s, a[2] * s],
+    distance: (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]),
+    Distance: (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]),
+    magnitude: (a) => Math.hypot(a[0], a[1], a[2]),
+    Magnitude: (a) => Math.hypot(a[0], a[1], a[2]),
+    normalize: (a) => { const m = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / m, a[1] / m, a[2] / m]; },
+    Normalize: (a) => { const m = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / m, a[1] / m, a[2] / m]; },
+    MoveTowards: function(current, target, maxDelta) {
+      var d = [target[0] - current[0], target[1] - current[1], target[2] - current[2]];
+      var len = Math.hypot(d[0], d[1], d[2]);
+      if (len <= maxDelta || len === 0) return [target[0], target[1], target[2]];
+      var f = maxDelta / len;
+      return [current[0] + d[0] * f, current[1] + d[1] * f, current[2] + d[2] * f];
+    },
+    Dot: (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2],
+    Cross: (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]],
+    LerpUnclamped: (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t],
+    Add: (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]],
+    Sub: (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]],
+    Scale: (a, s) => [a[0] * s, a[1] * s, a[2] * s],
+    Multiply: (a, b) => [a[0] * b[0], a[1] * b[1], a[2] * b[2]],
+    Divide: (a, b) => [a[0] / b[0], a[1] / b[1], a[2] / b[2]],
+    SqrDistance: (a, b) => { var dx=a[0]-b[0],dy=a[1]-b[1],dz=a[2]-b[2]; return dx*dx+dy*dy+dz*dz; },
+    SqrMagnitude: (a) => a[0]*a[0]+a[1]*a[1]+a[2]*a[2],
+    SmoothDamp: function(current, target, refVel, smoothTime, maxSpeed, dt) {
+      maxSpeed = maxSpeed || Infinity; dt = dt || 0.016;
+      var t = 1 - Math.exp(-dt / Math.max(0.0001, smoothTime));
+      var v = [(target[0]-current[0])*t, (target[1]-current[1])*t, (target[2]-current[2])*t];
+      var sp = Math.hypot(v[0],v[1],v[2]);
+      if (sp > maxSpeed*dt) { var f = (maxSpeed*dt)/sp; v[0]*=f; v[1]*=f; v[2]*=f; }
+      return [current[0]+v[0], current[1]+v[1], current[2]+v[2]];
+    },
+    SignedAngle: function(a, b, axis) {
+      var dot = a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+      var ma = Math.hypot(a[0],a[1],a[2]), mb = Math.hypot(b[0],b[1],b[2]);
+      var angle = Math.acos(Math.max(-1,Math.min(1, dot/(ma*mb||1)))) * 180/Math.PI;
+      var cross = [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+      var da = cross[0]*axis[0]+cross[1]*axis[1]+cross[2]*axis[2];
+      return da < 0 ? -angle : angle;
+    },
+    Project: function(v, n) { var m=(n[0]**2+n[1]**2+n[2]**2)||1; var d=(v[0]*n[0]+v[1]*n[1]+v[2]*n[2])/m; return [n[0]*d, n[1]*d, n[2]*d]; },
+    ProjectOnPlane: function(v, n) { var p = Vector3.Project(v, n); return [v[0]-p[0], v[1]-p[1], v[2]-p[2]]; },
+    Reflect: function(v, n) { var m=(n[0]**2+n[1]**2+n[2]**2)||1; var d=2*(v[0]*n[0]+v[1]*n[1]+v[2]*n[2])/m; return [v[0]-n[0]*d, v[1]-n[1]*d, v[2]-n[2]*d]; },
+    Max: (a, b) => [Math.max(a[0],b[0]), Math.max(a[1],b[1]), Math.max(a[2],b[2])],
+    Min: (a, b) => [Math.min(a[0],b[0]), Math.min(a[1],b[1]), Math.min(a[2],b[2])],
+    ClampMagnitude: function(v, maxLen) { var m=Math.hypot(v[0],v[1],v[2]); if (m<=maxLen||m===0) return [v[0],v[1],v[2]]; var f=maxLen/m; return [v[0]*f,v[1]*f,v[2]*f]; },
+  };
+  // Make Vector3 callable so new Vector3(x,y,z) works in JS/TS
+  Vector3 = Object.assign(function(x, y, z) { return [x||0, y||0, z||0]; }, Vector3);
+  var Mathf = {
+    Clamp: function(v, min, max) { return Math.max(min, Math.min(max, v)); },
+    Clamp01: function(v) { return Math.max(0, Math.min(1, v)); },
+    Lerp: function(a, b, t) { return a + (b - a) * t; },
+    MoveTowards: function(current, target, maxDelta) { return Math.abs(target - current) <= maxDelta ? target : current + Math.sign(target - current) * maxDelta; },
+    Abs: Math.abs, Min: Math.min, Max: Math.max,
+    Sin: Math.sin, Cos: Math.cos, Tan: Math.tan,
+    Sqrt: Math.sqrt, Pow: Math.pow, Floor: Math.floor, Ceil: Math.ceil, Round: Math.round, Sign: Math.sign,
+    PI: Math.PI, Deg2Rad: Math.PI / 180, Rad2Deg: 180 / Math.PI,
+    Infinity: Infinity, NegativeInfinity: -Infinity, Epsilon: 2.220446049250313e-16,
+    LerpAngle: function(a, b, t) { var d = ((b-a)%360+540)%360-180; return a + d*t; },
+    DeltaAngle: function(a, b) { return ((b-a)%360+540)%360-180; },
+    MoveTowardsAngle: function(cur, tgt, maxD) { var d = ((tgt-cur)%360+540)%360-180; return cur + (Math.abs(d)<=maxD ? d : Math.sign(d)*maxD); },
+    Approximately: function(a, b) { return Math.abs(a-b) < 0.00001; },
+    SmoothDamp: function(cur, tgt, refVel, smoothTime, maxSpeed, dt) {
+      smoothTime = Math.max(0.0001, smoothTime); dt = dt || 0.016; maxSpeed = maxSpeed || Infinity;
+      var omega = 2/smoothTime; var x = omega*dt; var exp = 1/(1+x+0.48*x*x+0.235*x*x*x);
+      var change = cur - tgt; var maxChange = maxSpeed*smoothTime;
+      var clampedChange = Math.max(-maxChange, Math.min(maxChange, change));
+      return tgt + (change - clampedChange) * exp;
+    },
+    SmoothStep: function(a, b, t) { t = Math.max(0, Math.min(1, (t-a)/(b-a||1))); return t*t*(3-2*t); },
+    PerlinNoise: function(x, y, z) { var n = Math.sin(x*12.9898 + (y||0)*78.233 + (z||0)*37.719) * 43758.5453; return n - Math.floor(n); },
+    Gamma: function(v) { return Math.pow(v, 1/2.2); },
+    IsPowerOfTwo: function(v) { return v > 0 && (v & (v-1)) === 0; },
+    NextPowerOfTwo: function(v) { var p=1; while(p<v) p*=2; return p; },
+  };
+  var Random = {
+    Range: function(min, max) { return min + Math.random() * (max - min); },
+    RangeInt: function(min, max) { return Math.floor(min + Math.random() * (max - min + 1)); },
+    value: function() { return Math.random(); },
+    insideUnitSphere: function() { var r=Math.cbrt(Math.random()); var t=Math.random()*Math.PI*2; var p=Math.acos(2*Math.random()-1); return [r*Math.sin(p)*Math.cos(t), r*Math.sin(p)*Math.sin(t), r*Math.cos(p)]; },
+    insideUnitCircle: function() { var a=Math.random()*Math.PI*2; var r=Math.sqrt(Math.random()); return [r*Math.cos(a), r*Math.sin(a), 0]; },
+    onUnitSphere: function() { var t=Math.random()*Math.PI*2; var p=Math.acos(2*Math.random()-1); return [Math.sin(p)*Math.cos(t), Math.sin(p)*Math.sin(t), Math.cos(p)]; },
+    rotation: function() { return [0,0,0]; },
+  };
+  var KeyCode = {
+    Space: 'Space', Return: 'Enter', Escape: 'Escape', Tab: 'Tab',
+    UpArrow: 'ArrowUp', DownArrow: 'ArrowDown', LeftArrow: 'ArrowLeft', RightArrow: 'ArrowRight',
+    W: 'KeyW', A: 'KeyA', S: 'KeyS', D: 'KeyD',
+    Q: 'KeyQ', E: 'KeyE', R: 'KeyR', T: 'KeyT', Y: 'KeyY', U: 'KeyU', I: 'KeyI', O: 'KeyO', P: 'KeyP',
+    F: 'KeyF', G: 'KeyG', H: 'KeyH', J: 'KeyJ', K: 'KeyK', L: 'KeyL',
+    Z: 'KeyZ', X: 'KeyX', C: 'KeyC', V: 'KeyV', B: 'KeyB', N: 'KeyN', M: 'KeyM',
+    Alpha0: 'Digit0', Alpha1: 'Digit1', Alpha2: 'Digit2', Alpha3: 'Digit3', Alpha4: 'Digit4',
+    Alpha5: 'Digit5', Alpha6: 'Digit6', Alpha7: 'Digit7', Alpha8: 'Digit8', Alpha9: 'Digit9',
+    LeftShift: 'ShiftLeft', RightShift: 'ShiftRight',
+    LeftControl: 'ControlLeft', RightControl: 'ControlRight',
+    LeftAlt: 'AltLeft', RightAlt: 'AltRight',
+    CapsLock: 'CapsLock', Backspace: 'Backspace', Delete: 'Delete',
+    F1: 'F1', F2: 'F2', F3: 'F3', F4: 'F4', F5: 'F5', F6: 'F6', F7: 'F7', F8: 'F8', F9: 'F9', F10: 'F10', F11: 'F11', F12: 'F12',
+    Keypad0: 'Numpad0', Keypad1: 'Numpad1', Keypad2: 'Numpad2', Keypad3: 'Numpad3', Keypad4: 'Numpad4',
+    Keypad5: 'Numpad5', Keypad6: 'Numpad6', Keypad7: 'Numpad7', Keypad8: 'Numpad8', Keypad9: 'Numpad9',
+    KeypadEnter: 'NumpadEnter', KeypadPlus: 'NumpadAdd', KeypadMinus: 'NumpadSubtract', KeypadMultiply: 'NumpadMultiply', KeypadDivide: 'NumpadDivide',
+    Mouse0: 0, Mouse1: 1, Mouse2: 2,
+  };
+  var Quaternion = {
+    identity: [0, 0, 0],
+    Euler: function(x, y, z) { return [(x||0)*Math.PI/180, (y||0)*Math.PI/180, (z||0)*Math.PI/180]; },
+    Slerp: function(a, b, t) {
+      var qa = new THREE.Quaternion().setFromEuler(new THREE.Euler(a[0],a[1],a[2]));
+      var qb = new THREE.Quaternion().setFromEuler(new THREE.Euler(b[0],b[1],b[2]));
+      qa.slerp(qb, t); var e = new THREE.Euler().setFromQuaternion(qa); return [e.x, e.y, e.z];
+    },
+    Lerp: function(a, b, t) { return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t]; },
+    LookRotation: function(fwd, up) {
+      var f = new THREE.Vector3(fwd[0],fwd[1],fwd[2]).normalize();
+      var u = up ? new THREE.Vector3(up[0],up[1],up[2]).normalize() : new THREE.Vector3(0,1,0);
+      var m = new THREE.Matrix4().lookAt(new THREE.Vector3(0,0,0), f, u);
+      var q = new THREE.Quaternion().setFromRotationMatrix(m); var e = new THREE.Euler().setFromQuaternion(q);
+      return [e.x, e.y, e.z];
+    },
+    AngleAxis: function(angle, axis) {
+      var rad = angle*Math.PI/180;
+      var q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(axis[0],axis[1],axis[2]).normalize(), rad);
+      var e = new THREE.Euler().setFromQuaternion(q); return [e.x, e.y, e.z];
+    },
+    FromToRotation: function(fromDir, toDir) {
+      var f = new THREE.Vector3(fromDir[0],fromDir[1],fromDir[2]).normalize();
+      var t = new THREE.Vector3(toDir[0],toDir[1],toDir[2]).normalize();
+      var q = new THREE.Quaternion().setFromUnitVectors(f, t); var e = new THREE.Euler().setFromQuaternion(q);
+      return [e.x, e.y, e.z];
+    },
+    Inverse: function(rot) {
+      var q = new THREE.Quaternion().setFromEuler(new THREE.Euler(rot[0],rot[1],rot[2])); q.invert();
+      var e = new THREE.Euler().setFromQuaternion(q); return [e.x, e.y, e.z];
+    },
+    Angle: function(a, b) {
+      var qa = new THREE.Quaternion().setFromEuler(new THREE.Euler(a[0],a[1],a[2]));
+      var qb = new THREE.Quaternion().setFromEuler(new THREE.Euler(b[0],b[1],b[2]));
+      return qa.angleTo(qb) * 180/Math.PI;
+    },
+    Dot: function(a, b) { return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; },
+  };
+  var Debug = {
+    Log: function() { console.log.apply(console, arguments); },
+    LogWarning: function() { console.warn.apply(console, arguments); },
+    LogError: function() { console.error.apply(console, arguments); },
+    Assert: function(cond) { if (!cond) console.error('Assertion failed:', Array.prototype.slice.call(arguments, 1)); },
+    DrawLine: function() {}, DrawRay: function() {},
+  };
+  var Screen = {
+    get width() { return innerWidth; }, get height() { return innerHeight; },
+    get dpi() { return devicePixelRatio; },
+    get currentResolution() { return { width: innerWidth, height: innerHeight }; },
+    get resolutions() { return [{ width: innerWidth, height: innerHeight }]; },
+    get fullScreen() { return true; },
+    get orientation() { return innerWidth > innerHeight ? 1 : 2; },
+  };
+  var Vector2 = {
+    up: [0, 1], down: [0, -1], left: [-1, 0], right: [1, 0], zero: [0, 0], one: [1, 1],
+    Lerp: function(a, b, t) { return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t]; },
+    MoveTowards: function(cur, tgt, maxD) { var d=[tgt[0]-cur[0],tgt[1]-cur[1]]; var len=Math.hypot(d[0],d[1]); if(len<=maxD||len===0) return [tgt[0],tgt[1]]; var f=maxD/len; return [cur[0]+d[0]*f, cur[1]+d[1]*f]; },
+    Scale: function(a, s) { return [a[0]*s, a[1]*s]; },
+    Add: function(a, b) { return [a[0]+b[0], a[1]+b[1]]; },
+    Sub: function(a, b) { return [a[0]-b[0], a[1]-b[1]]; },
+    Dot: function(a, b) { return a[0]*b[0]+a[1]*b[1]; },
+    Distance: function(a, b) { return Math.hypot(a[0]-b[0], a[1]-b[1]); },
+    Magnitude: function(a) { return Math.hypot(a[0], a[1]); },
+    Normalize: function(a) { var m=Math.hypot(a[0],a[1])||1; return [a[0]/m, a[1]/m]; },
+    Angle: function(a, b) { var dot=a[0]*b[0]+a[1]*b[1]; var ma=Math.hypot(a[0],a[1]),mb=Math.hypot(b[0],b[1]); return Math.acos(Math.max(-1,Math.min(1,dot/(ma*mb||1))))*180/Math.PI; },
+    ClampMagnitude: function(v, maxLen) { var m=Math.hypot(v[0],v[1]); if(m<=maxLen||m===0) return [v[0],v[1]]; var f=maxLen/m; return [v[0]*f, v[1]*f]; },
+    Perpendicular: function(a) { return [-a[1], a[0]]; },
+  };
+  // Make Vector2 callable so new Vector2(x,y) works in JS/TS
+  Vector2 = Object.assign(function(x, y) { return [x||0, y||0]; }, Vector2);
+  var Vector2Int = { up: [0, 1], down: [0, -1], left: [-1, 0], right: [1, 0], zero: [0, 0], one: [1, 1] };
+  var Vector3Int = { up: [0, 1, 0], down: [0, -1, 0], left: [-1, 0, 0], right: [1, 0, 0], forward: [0, 0, 1], back: [0, 0, -1], zero: [0, 0, 0], one: [1, 1, 1] };
+  var Color = {
+    red: [1,0,0,1], green: [0,1,0,1], blue: [0,0,1,1], white: [1,1,1,1], black: [0,0,0,1],
+    yellow: [1,0.92,0.016,1], cyan: [0,1,1,1], magenta: [1,0,1,1], gray: [0.5,0.5,0.5,1], grey: [0.5,0.5,0.5,1],
+    clear: [0,0,0,0], orange: [1,0.5,0,1], purple: [0.5,0,0.5,1], pink: [1,0.4,0.6,1], brown: [0.5,0.25,0,1],
+    Lerp: function(a, b, t) { return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t, (a[3]||1)+((b[3]||1)-(a[3]||1))*t]; },
+    HSVToRGB: function(h, s, v) { h=h%1; s=Math.max(0,Math.min(1,s)); v=Math.max(0,Math.min(1,v)); var i=Math.floor(h*6); var f=h*6-i; var p=v*(1-s); var q=v*(1-f*s); var t2=v*(1-(1-f)*s); var r,g,b; switch(i%6){case 0:r=v;g=t2;b=p;break;case 1:r=q;g=v;b=p;break;case 2:r=p;g=v;b=t2;break;case 3:r=p;g=q;b=v;break;case 4:r=t2;g=p;b=v;break;case 5:r=v;g=p;b=q;break;} return [r,g,b,1]; },
+    RGBToHSV: function(r, g, b) { var max=Math.max(r,g,b),min=Math.min(r,g,b); var d=max-min; var h=0; if(d!==0){if(max===r)h=((g-b)/d)%6;else if(max===g)h=(b-r)/d+2;else h=(r-g)/d+4;h/=6;if(h<0)h+=1;} var s=max===0?0:d/max; return [h,s,max]; },
+    grayscale: function(c) { var g=c[0]*0.299+c[1]*0.587+c[2]*0.114; return [g,g,g,c[3]||1]; },
+  };
+  // Make Color callable so new Color(r,g,b,a) works in JS/TS
+  Color = Object.assign(function(r, g, b, a) { return [r||0, g||0, b||0, a==null?1:a]; }, Color);
+  var Color32 = { red: [255,0,0,255], green: [0,255,0,255], blue: [0,0,255,255], white: [255,255,255,255], black: [0,0,0,255], yellow: [255,235,4,255], cyan: [0,255,255,255], magenta: [255,0,255,255], gray: [128,128,128,255], clear: [0,0,0,0] };
+  var Bounds = {
+    Contains: function(b, p) { return p[0]>=b.min[0]&&p[0]<=b.max[0]&&p[1]>=b.min[1]&&p[1]<=b.max[1]&&p[2]>=b.min[2]&&p[2]<=b.max[2]; },
+    Intersects: function(a, b) { return a.min[0]<=b.max[0]&&a.max[0]>=b.min[0]&&a.min[1]<=b.max[1]&&a.max[1]>=b.min[1]&&a.min[2]<=b.max[2]&&a.max[2]>=b.min[2]; },
+    ClosestPoint: function(b, p) { return [Math.max(b.min[0],Math.min(p[0],b.max[0])), Math.max(b.min[1],Math.min(p[1],b.max[1])), Math.max(b.min[2],Math.min(p[2],b.max[2]))]; },
+  };
+  var Rect = {
+    Contains: function(r, p) { return p[0]>=r.x&&p[0]<=r.x+r.width&&p[1]>=r.y&&p[1]<=r.y+r.height; },
+    Overlaps: function(a, b) { return a.x<b.x+b.width&&a.x+a.width>b.x&&a.y<b.y+b.height&&a.y+a.height>b.y; },
+  };
+  var LayerMask = { NameToLayer: function(n) { return 0; }, LayerToName: function(l) { return 'Default'; }, value: 0 };
+  var _pp = typeof localStorage !== 'undefined' ? localStorage : {};
+  var PlayerPrefs = {
+    SetInt: function(k, v) { _pp[k] = String(v); },
+    GetInt: function(k, d) { var v = _pp[k]; return v != null ? parseInt(v, 10) : (d || 0); },
+    SetFloat: function(k, v) { _pp[k] = String(v); },
+    GetFloat: function(k, d) { var v = _pp[k]; return v != null ? parseFloat(v) : (d || 0); },
+    SetString: function(k, v) { _pp[k] = String(v); },
+    GetString: function(k, d) { var v = _pp[k]; return v != null ? String(v) : (d || ''); },
+    DeleteKey: function(k) { delete _pp[k]; },
+    DeleteAll: function() { Object.keys(_pp).forEach(function(k) { delete _pp[k]; }); },
+    HasKey: function(k) { return k in _pp; },
+    Save: function() {},
+  };
+  var Application = {
+    get platform() { return /Android|iPhone|iPad/i.test(navigator.userAgent) ? 1 : 2; },
+    get isPlaying() { return true; }, get isEditor() { return false; },
+    get runInBackground() { return false; }, get loadedLevel() { return 0; },
+    get version() { return '1.0'; }, get systemLanguage() { return navigator.language || 'en'; },
+    get internetReachability() { return navigator.onLine ? 1 : 0; },
+    quit: function() { try { window.close(); } catch(e) {} },
+    OpenURL: function(url) { window.open(url, '_blank'); },
+  };
+  var SceneManager = {
+    sceneCount: 1,
+    GetActiveScene: function() { return { name: 'Main', buildIndex: 0, isLoaded: true }; },
+    LoadScene: function() { window.location.reload(); },
+    GetSceneByName: function(n) { return { name: n, buildIndex: 0, isLoaded: true }; },
+  };
+  var Resources = { Load: function() { return null; }, LoadAll: function() { return []; }, UnloadAsset: function() {}, UnloadUnusedAssets: function() {} };
+  var JsonUtility = {
+    ToJson: function(obj, pretty) { return pretty ? JSON.stringify(obj, null, 2) : JSON.stringify(obj); },
+    FromJson: function(json) { try { return JSON.parse(json); } catch(e) { return null; } },
+    FromJsonOverwrite: function(json, obj) { try { Object.assign(obj, JSON.parse(json)); } catch(e) {} return obj; },
+  };
+  var SystemInfo = {
+    get deviceName() { return navigator.platform || 'Unknown'; },
+    get operatingSystem() { return navigator.userAgent; },
+    get processorCount() { return navigator.hardwareConcurrency || 4; },
+    get systemMemorySize() { return 4096; },
+    get graphicsMemorySize() { return 1024; },
+    get graphicsDeviceName() { return 'WebGL Renderer'; },
+    get supportsShadows() { return true; },
+    get supportsInstancing() { return true; },
+    get maxTextureSize() { return 4096; },
+  };
+  var QualitySettings = {
+    names: ['Low', 'Medium', 'High', 'Ultra'],
+    GetQualityLevel: function() { return 2; },
+    SetQualityLevel: function() {},
+    get pixelLightCount() { return 4; },
+    get shadows() { return 2; },
+    get antiAliasing() { return 4; },
+  };
+  var _coroutines = new Map(); var _nextCoId = 1;
+  function StartCoroutine(gen) {
+    if (!gen || typeof gen.next !== 'function') return -1;
+    var id = _nextCoId++;
+    function step() {
+      if (!_coroutines.has(id)) return;
+      var r; try { r = gen.next(); } catch(e) { _coroutines.delete(id); return; }
+      if (r.done) { _coroutines.delete(id); return; }
+      var v = r.value;
+      if (v && v.type === 'WaitForSeconds') _coroutines.set(id, setTimeout(step, Math.max(0, v.seconds * 1000)));
+      else if (v && v.type === 'WaitForEndOfFrame') _coroutines.set(id, requestAnimationFrame(step));
+      else if (v && v.type === 'WaitUntil') { if (v.predicate && v.predicate()) step(); else _coroutines.set(id, setTimeout(step, 16)); }
+      else if (v && v.type === 'WaitWhile') { if (v.predicate && !v.predicate()) step(); else _coroutines.set(id, setTimeout(step, 16)); }
+      else _coroutines.set(id, setTimeout(step, 0));
+    }
+    step(); return id;
+  }
+  function StopCoroutine(id) { if (_coroutines.has(id)) { var t = _coroutines.get(id); if (t) clearTimeout(t); _coroutines.delete(id); } }
+  function StopAllCoroutines() { _coroutines.forEach(function(t) { if (t) clearTimeout(t); }); _coroutines.clear(); }
+  function WaitForSeconds(s) { return { type: 'WaitForSeconds', seconds: s }; }
+  function WaitForEndOfFrame() { return { type: 'WaitForEndOfFrame' }; }
+  function WaitForSecondsRealtime(s) { return { type: 'WaitForSeconds', seconds: s }; }
+  function WaitUntil(p) { return { type: 'WaitUntil', predicate: p }; }
+  function WaitWhile(p) { return { type: 'WaitWhile', predicate: p }; }
+  function makeTransform(mesh) {
+    var transform = {
+      get position() { return [mesh.position.x, mesh.position.y, mesh.position.z]; },
+      set position(v) { mesh.position.set(v[0] || 0, v[1] || 0, v[2] || 0); },
+      get rotation() { return [mesh.rotation.x, mesh.rotation.y, mesh.rotation.z]; },
+      set rotation(v) { mesh.rotation.set(v[0] || 0, v[1] || 0, v[2] || 0); },
+      get scale() { return [mesh.scale.x, mesh.scale.y, mesh.scale.z]; },
+      set scale(v) { mesh.scale.set(v[0] == null ? 1 : v[0], v[1] == null ? 1 : v[1], v[2] == null ? 1 : v[2]); },
+      get eulerAngles() { var r = transform.rotation; return [r[0] * 180 / Math.PI, r[1] * 180 / Math.PI, r[2] * 180 / Math.PI]; },
+      set eulerAngles(v) { transform.rotation = [(v[0] || 0) * Math.PI / 180, (v[1] || 0) * Math.PI / 180, (v[2] || 0) * Math.PI / 180]; },
+      get localPosition() { return transform.position; },
+      set localPosition(v) { transform.position = v; },
+      get localRotation() { return transform.rotation; },
+      set localRotation(v) { transform.rotation = v; },
+      get localScale() { return transform.scale; },
+      set localScale(v) { transform.scale = v; },
+      Rotate: function(axis, angle) {
+        var rad = angle * Math.PI / 180;
+        var r = transform.rotation;
+        var q = new THREE.Quaternion().setFromEuler(new THREE.Euler(r[0], r[1], r[2]));
+        var rq = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(axis[0], axis[1], axis[2]).normalize(), rad);
+        q.multiply(rq);
+        var e = new THREE.Euler().setFromQuaternion(q);
+        transform.rotation = [e.x, e.y, e.z];
+      },
+      Translate: function(x, y, z) {
+        var p = transform.position;
+        if (Array.isArray(x)) { transform.position = [p[0] + x[0], p[1] + x[1], p[2] + x[2]]; }
+        else { transform.position = [p[0] + (x || 0), p[1] + (y || 0), p[2] + (z || 0)]; }
+      },
+      LookAt: function(target) { mesh.lookAt(new THREE.Vector3(target[0], target[1], target[2])); },
+      get right() { var v = new THREE.Vector3(1,0,0).applyQuaternion(mesh.quaternion); return [v.x, v.y, v.z]; },
+      get up() { var v = new THREE.Vector3(0,1,0).applyQuaternion(mesh.quaternion); return [v.x, v.y, v.z]; },
+      get forward() { var v = new THREE.Vector3(0,0,1).applyQuaternion(mesh.quaternion); return [v.x, v.y, v.z]; },
+      RotateAround: function(point, axis, angle) {
+        var rad = angle * Math.PI / 180;
+        var a = new THREE.Vector3(axis[0],axis[1],axis[2]).normalize();
+        var q = new THREE.Quaternion().setFromAxisAngle(a, rad);
+        var p = new THREE.Vector3(point[0],point[1],point[2]);
+        var cur = new THREE.Vector3().fromArray(transform.position);
+        var off = cur.clone().sub(p); off.applyQuaternion(q);
+        var np = p.clone().add(off); transform.position = [np.x, np.y, np.z];
+        var cr = new THREE.Quaternion().setFromEuler(new THREE.Euler(transform.rotation[0], transform.rotation[1], transform.rotation[2]));
+        cr.multiply(q); var e = new THREE.Euler().setFromQuaternion(cr); transform.rotation = [e.x, e.y, e.z];
+      },
+      TransformDirection: function(d) { mesh.updateMatrixWorld(); var v = new THREE.Vector3(d[0],d[1],d[2]); v.applyQuaternion(mesh.quaternion); return [v.x, v.y, v.z]; },
+      InverseTransformDirection: function(d) { var v = new THREE.Vector3(d[0],d[1],d[2]); v.applyQuaternion(mesh.quaternion.clone().invert()); return [v.x, v.y, v.z]; },
+      TransformPoint: function(p) { mesh.updateMatrixWorld(); var v = new THREE.Vector3(p[0],p[1],p[2]); v.applyMatrix4(mesh.matrixWorld); return [v.x, v.y, v.z]; },
+      InverseTransformPoint: function(p) { mesh.updateMatrixWorld(); var v = new THREE.Vector3(p[0],p[1],p[2]); v.applyMatrix4(mesh.matrixWorld.clone().invert()); return [v.x, v.y, v.z]; },
+      _mesh: mesh,
+    };
+    return transform;
+  }
+  const Input = { keys: {}, keysPressed: {}, keysReleased: {} };
+  Input.isKeyDown = (k) => !!Input.keys[k];
+  Input.GetKey = (k) => !!Input.keys[k];
+  Input.GetKeyDown = (k) => !!Input.keysPressed[k];
+  Input.GetKeyUp = (k) => !!Input.keysReleased[k];
+  addEventListener('keydown', (e) => { if (!Input.keys[e.code]) Input.keysPressed[e.code] = true; Input.keys[e.code] = true; });
+  addEventListener('keyup', (e) => { Input.keys[e.code] = false; Input.keysReleased[e.code] = true; });
+  Input.mouseButtons = {}; Input.mouseButtonsPressed = {}; Input.mouseButtonsReleased = {};
+  Input.mousePosition = [0, 0, 0]; Input.mouseDelta = [0, 0]; Input.mouseWheel = 0;
+  renderer.domElement.addEventListener('mousedown', (e) => { Input.mouseButtons[e.button] = true; Input.mouseButtonsPressed[e.button] = true; });
+  renderer.domElement.addEventListener('mouseup', (e) => { Input.mouseButtons[e.button] = false; Input.mouseButtonsReleased[e.button] = true; });
+  renderer.domElement.addEventListener('mousemove', (e) => { var rect = renderer.domElement.getBoundingClientRect(); Input.mouseDelta[0] += e.clientX - (Input._lmx || e.clientX); Input.mouseDelta[1] += e.clientY - (Input._lmy || e.clientY); Input._lmx = e.clientX; Input._lmy = e.clientY; Input.mousePosition = [e.clientX - rect.left, e.clientY - rect.top, 0]; });
+  renderer.domElement.addEventListener('wheel', (e) => { Input.mouseWheel = e.deltaY > 0 ? 1 : -1; }, { passive: true });
+  var buttonMap = { 'Jump': 'Space', 'Fire1': 'ControlLeft', 'Fire2': 'ControlRight', 'Fire3': 'ShiftLeft', 'Submit': 'Enter', 'Cancel': 'Escape' };
+  Input.GetAxis = function(name) {
+    var n = (name||'').toLowerCase();
+    if (n === 'horizontal') { var v = 0; if (Input.keys['KeyA'] || Input.keys['ArrowLeft']) v -= 1; if (Input.keys['KeyD'] || Input.keys['ArrowRight']) v += 1; return v; }
+    if (n === 'vertical') { var v2 = 0; if (Input.keys['KeyS'] || Input.keys['ArrowDown']) v2 -= 1; if (Input.keys['KeyW'] || Input.keys['ArrowUp']) v2 += 1; return v2; }
+    if (n === 'mouse x') return Input.mouseDelta[0];
+    if (n === 'mouse y') return Input.mouseDelta[1];
+    if (n === 'mouse scrollwheel') return Input.mouseWheel;
+    return 0;
+  };
+  Input.GetAxisRaw = Input.GetAxis;
+  Input.GetButton = function(name) { return !!Input.keys[buttonMap[name] || name]; };
+  Input.GetButtonDown = function(name) { return !!Input.keysPressed[buttonMap[name] || name]; };
+  Input.GetButtonUp = function(name) { return !!Input.keysReleased[buttonMap[name] || name]; };
+  Input.GetMouseButton = function(b) { return !!Input.mouseButtons[b]; };
+  Input.GetMouseButtonDown = function(b) { return !!Input.mouseButtonsPressed[b]; };
+  Input.GetMouseButtonUp = function(b) { return !!Input.mouseButtonsReleased[b]; };
+  Object.defineProperty(Input, 'anyKey', { get: function() { return Object.keys(Input.keys).length > 0; } });
+  Object.defineProperty(Input, 'anyKeyDown', { get: function() { return Object.keys(Input.keysPressed).length > 0; } });
+  Object.defineProperty(Input, 'mousePresent', { get: function() { return true; } });
+  Object.defineProperty(Input, 'touchCount', { get: function() { return 0; } });
+  Object.defineProperty(Input, 'touches', { get: function() { return []; } });
+  Object.defineProperty(Input, 'acceleration', { get: function() { return [0, 0, 0]; } });
+  Object.defineProperty(Input, 'gyro', { get: function() { return { enabled: false, rotationRate: [0,0,0], gravity: [0,0,0], attitude: [0,0,0,0] }; } });
+  Object.defineProperty(Input, 'compass', { get: function() { return { enabled: false, magneticHeading: 0, trueHeading: 0 }; } });
+  Input.GetTouch = function(i) { return null; };
+  Input.IsJoystickPreconfigured = function() { return false; };
+  Input.GetJoystickNames = function() { return []; };
+  Input.ResetInputAxes = function() {};
+  var mkVRHand = function() { return { position: [0,0,0], rotation: [0,0,0,0,1], velocity: [0,0,0], angularVelocity: [0,0,0], grip: false, gripDown: false, gripUp: false, trigger: false, triggerDown: false, triggerUp: false, thumbstick: [0,0], thumbstickDown: false, _lastPos: null, _prevGrip: false, _prevTrigger: false }; };
+  var vrInput = { present: false, leftHand: mkVRHand(), rightHand: mkVRHand(), head: { position: [0,0,0], rotation: [0,0,0,0,1] } };
+  var VR = {
+    get present() { return vrInput.present; },
+    get leftHand() { return vrInput.leftHand; },
+    get rightHand() { return vrInput.rightHand; },
+    get head() { return vrInput.head; },
+    GetController: function(hand) { return hand === 'left' ? vrInput.leftHand : vrInput.rightHand; },
+    SnapTurn: function(angle) { var r = DATA.find(function(o) { return o.vrRole === 'rig'; }); if (r) { r.rotation[1] = (r.rotation[1] || 0) + angle * Math.PI / 180; } },
+  };
+  var Network = {
+    isOnline: false, playerId: 'local', players: [], room: null,
+    Connect: function(room) { Network.isOnline = true; Network.room = room; },
+    Disconnect: function() { Network.isOnline = false; Network.players = []; },
+    Send: function(data) {}, OnReceive: function(cb) {}, OnPlayerJoin: function(cb) {}, OnPlayerLeave: function(cb) {},
+    GetPlayer: function(id) { return null; }, GetAllPlayers: function() { return Network.players; },
+    RPC: function() {}, SetServer: function(url) {}, Spawn: function() { return null; }, Destroy: function() {}, isServer: false,
+  };
+  const World = WORLD || {};
+  // ---- Game Systems (procedural, AI, pathfinding, particles, etc.) ----
+  
+  // ---- Game Systems ----
+  var Procedural = {
+    Noise2D: function(x, y, s) { s = s || 0; var n = Math.sin((x+s)*12.9898 + y*78.233) * 43758.5453; return n - Math.floor(n); },
+    fBm: function(x, y, oct, p, l, s) { oct = oct||4; p = p||0.5; l = l||2; s = s||0; var v=0,a=1,f=1,m=0; for(var i=0;i<oct;i++){v+=Procedural.Noise2D(x*f,y*f,s+i)*a; m+=a; a*=p; f*=l;} return v/m; },
+    Terrain: function(w, h, sc, mh, s) { sc=sc||0.1; mh=mh||10; s=s||0; var map=[]; for(var z=0;z<h;z++){var r=[]; for(var x=0;x<w;x++) r.push(Procedural.fBm(x*sc,z*sc,4,0.5,2,s)*mh); map.push(r);} return map; },
+    Maze: function(w, h) { w = w%2===0?w+1:w; h = h%2===0?h+1:h; var g = Array.from({length:h},function(){return Array(w).fill(1)}); var st=[[1,1]]; g[1][1]=0; var d=[[0,2],[0,-2],[2,0],[-2,0]]; while(st.length){var c=st[st.length-1]; var sh=d.slice().sort(function(){return Math.random()-0.5}); var mv=false; for(var i=0;i<sh.length;i++){var dx=sh[i][0],dy=sh[i][1]; var nx=c[0]+dx,ny=c[1]+dy; if(nx>0&&nx<w-1&&ny>0&&ny<h-1&&g[ny][nx]===1){g[ny][nx]=0; g[c[1]+dy/2][c[0]+dx/2]=0; st.push([nx,ny]); mv=true; break;}} if(!mv) st.pop();} return g; },
+    Dungeon: function(w, h, rc, mn, mx) { rc=rc||8; mn=mn||4; mx=mx||10; var g=Array.from({length:h},function(){return Array(w).fill(1)}); var rooms=[]; var att=0; while(rooms.length<rc&&att<100){att++; var rw=Math.floor(mn+Math.random()*(mx-mn)); var rh=Math.floor(mn+Math.random()*(mx-mn)); var rx=Math.floor(1+Math.random()*(w-rw-2)); var ry=Math.floor(1+Math.random()*(h-rh-2)); var ov=false; for(var i=0;i<rooms.length;i++){var r=rooms[i]; if(rx<r.x+r.w+1&&rx+rw+1>r.x&&ry<r.y+r.h+1&&ry+rh+1>r.y){ov=true;break;}} if(!ov){for(var y=ry;y<ry+rh;y++)for(var x=rx;x<rx+rw;x++)g[y][x]=0; rooms.push({x:rx,y:ry,w:rw,h:rh,center:[Math.floor(rx+rw/2),Math.floor(ry+rh/2)]});}} for(var i=1;i<rooms.length;i++){var x1=rooms[i-1].center[0],y1=rooms[i-1].center[1],x2=rooms[i].center[0],y2=rooms[i].center[1]; if(Math.random()<0.5){for(var x=Math.min(x1,x2);x<=Math.max(x1,x2);x++)g[y1][x]=0; for(var y=Math.min(y1,y2);y<=Math.max(y1,y2);y++)g[y][x2]=0;}else{for(var y=Math.min(y1,y2);y<=Math.max(y1,y2);y++)g[y][x1]=0; for(var x=Math.min(x1,x2);x<=Math.max(x1,x2);x++)g[y2][x]=0;}} return {grid:g,rooms:rooms}; },
+    Caves: function(w, h, fp, it) { fp=fp||0.45; it=it||5; var g=Array.from({length:h},function(){return Array.from({length:w},function(){return Math.random()<fp?1:0})}); for(var it2=0;it2<it;it2++){var nx=g.map(function(r){return r.slice()}); for(var y=1;y<h-1;y++)for(var x=1;x<w-1;x++){var n=0; for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++){if(dx===0&&dy===0)continue; if(g[y+dy][x+dx]===1)n++;} if(n>=5)nx[y][x]=1; else if(n<4)nx[y][x]=0;} g=nx;} return g; },
+    Scatter: function(w, h, md, ma) { ma=ma||30; var pts=[]; var cs=md/Math.SQRT2; var gw=Math.ceil(w/cs),gh=Math.ceil(h/cs); var grid=Array.from({length:gh},function(){return Array(gw).fill(null)}); var f=[Math.random()*w,Math.random()*h]; pts.push(f); grid[Math.floor(f[1]/cs)][Math.floor(f[0]/cs)]=0; var act=[f]; while(act.length){var idx=Math.floor(Math.random()*act.length); var px=act[idx][0],py=act[idx][1]; var fd=false; for(var i=0;i<ma;i++){var a=Math.random()*Math.PI*2; var r=md+Math.random()*md; var nx=px+Math.cos(a)*r,ny=py+Math.sin(a)*r; if(nx<0||nx>=w||ny<0||ny>=h)continue; var gx=Math.floor(nx/cs),gy=Math.floor(ny/cs); var ok=true; for(var dy=-2;dy<=2&&ok;dy++)for(var dx=-2;dx<=2&&ok;dx++){var cx=gx+dx,cy=gy+dy; if(cx>=0&&cx<gw&&cy>=0&&cy<gh&&grid[cy][cx]!==null){var ex=pts[grid[cy][cx]][0],ey=pts[grid[cy][cx]][1]; if(Math.hypot(nx-ex,ny-ey)<md)ok=false;}} if(ok){pts.push([nx,ny]); grid[gy][gx]=pts.length-1; act.push([nx,ny]); fd=true; break;}} if(!fd)act.splice(idx,1);} return pts; },
+    Voronoi: function(w, h, sc) { sc=sc||20; var seeds=Array.from({length:sc},function(){return [Math.random()*w,Math.random()*h]}); var map=Array.from({length:h},function(){return Array(w).fill(0)}); for(var y=0;y<h;y++)for(var x=0;x<w;x++){var md=Infinity,idx=0; for(var i=0;i<seeds.length;i++){var d=Math.hypot(x-seeds[i][0],y-seeds[i][1]); if(d<md){md=d;idx=i;}} map[y][x]=idx;} return {map:map,seeds:seeds}; },
+    LSystem: function(ax, rules, it) { var r=ax; for(var i=0;i<it;i++){var nx=''; for(var c=0;c<r.length;c++)nx+=rules[r[c]]||r[c]; r=nx;} return r; },
+  };
+  var NavMesh = {
+    FindPath: function(start, end, grid) { var h=grid.length,w=grid[0].length; var sx=start[0],sy=start[1],ex=end[0],ey=end[1]; if(sx<0||sx>=w||sy<0||sy>=h||ex<0||ex>=w||ey<0||ey>=h)return []; if(grid[sy][sx]===1||grid[ey][ex]===1)return []; var key=function(x,y){return y*w+x}; var open=new Map(),closed=new Set(),came=new Map(),gS=new Map(),fS=new Map(); gS.set(key(sx,sy),0); fS.set(key(sx,sy),Math.hypot(sx-ex,sy-ey)); open.set(key(sx,sy),[sx,sy,fS.get(key(sx,sy))]); while(open.size){var cur=null,lf=Infinity; open.forEach(function(v){if(v[2]<lf){lf=v[2];cur=v;}}); var cx=cur[0],cy=cur[1]; if(cx===ex&&cy===ey){var path=[[cx,cy]]; var ck=key(cx,cy); while(came.has(ck)){var p=came.get(ck); path.unshift([p[0],p[1]]); ck=key(p[0],p[1]);} return path;} open.delete(key(cx,cy)); closed.add(key(cx,cy)); var dirs=[[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]]; for(var i=0;i<dirs.length;i++){var dx=dirs[i][0],dy=dirs[i][1]; var nx=cx+dx,ny=cy+dy; if(nx<0||nx>=w||ny<0||ny>=h)continue; if(grid[ny][nx]===1)continue; if(closed.has(key(nx,ny)))continue; var tg=(gS.get(key(cx,cy))||0)+(dx!==0&&dy!==0?1.414:1); if(tg<(gS.get(key(nx,ny))||Infinity)){came.set(key(nx,ny),[cx,cy]); gS.set(key(nx,ny),tg); var f=tg+Math.hypot(nx-ex,ny-ey); fS.set(key(nx,ny),f); open.set(key(nx,ny),[nx,ny,f]);}}} return []; },
+    CreateGrid: function(w, h, cs, obs) { var gw=Math.ceil(w/cs),gh=Math.ceil(h/cs); var g=Array.from({length:gh},function(){return Array(gw).fill(0)}); for(var i=0;i<obs.length;i++){var o=obs[i]; var ox,oz,ow,od; if(Array.isArray(o)){ox=o[0];oz=o[1];ow=cs;od=cs;}else{ox=o.x;oz=o.z;ow=o.w||cs;od=o.d||cs;} var x0=Math.floor((ox-ow/2)/cs),x1=Math.ceil((ox+ow/2)/cs); var z0=Math.floor((oz-od/2)/cs),z1=Math.ceil((oz+od/2)/cs); for(var z=Math.max(0,z0);z<Math.min(gh,z1);z++)for(var x=Math.max(0,x0);x<Math.min(gw,x1);x++)g[z][x]=1;} return g; },
+    WorldToGrid: function(pos, cs, origin) { var ox=origin?origin[0]:0,oz=origin?origin[2]:0; return [Math.floor((pos[0]-ox)/cs), Math.floor((pos[2]-oz)/cs)]; },
+    GridToWorld: function(cell, cs, origin) { var ox=origin?origin[0]:0,oz=origin?origin[2]:0; return [cell[0]*cs+cs/2+ox, 0, cell[1]*cs+cs/2+oz]; },
+    HasLineOfSight: function(from, to, rf) { if(!rf)return true; var d=[to[0]-from[0],to[1]-from[1],to[2]-from[2]]; var dist=Math.hypot(d[0],d[1],d[2]); return rf(from,d,dist)===null; },
+    Flee: function(from, threat, dist) { var d=[from[0]-threat[0],from[1]-threat[1],from[2]-threat[2]]; var l=Math.hypot(d[0],d[1],d[2])||1; return [from[0]+d[0]/l*dist,from[1]+d[1]/l*dist,from[2]+d[2]/l*dist]; },
+    Wander: function(center, radius) { var a=Math.random()*Math.PI*2; var r=Math.random()*radius; return [center[0]+Math.cos(a)*r,center[1],center[2]+Math.sin(a)*r]; },
+  };
+  var AI = {
+    StateMachine: function() { var sm={states:{},current:null,add:function(n,se,su,sx){sm.states[n]={onEnter:se,onUpdate:su,onExit:sx};return sm;},transition:function(n){if(sm.current===n)return; if(sm.current&&sm.states[sm.current]&&sm.states[sm.current].onExit)sm.states[sm.current].onExit(); sm.current=n; if(sm.states[n]&&sm.states[n].onEnter)sm.states[n].onEnter();},update:function(){if(sm.current&&sm.states[sm.current]&&sm.states[sm.current].onUpdate)sm.states[sm.current].onUpdate.apply(null,arguments);}}; Object.defineProperty(sm,'state',{get:function(){return sm.current}}); return sm; },
+    Seek: function(s, t, sp, dt) { var d=[t[0]-s[0],t[1]-s[1],t[2]-s[2]]; var l=Math.hypot(d[0],d[1],d[2])||1; return [s[0]+d[0]/l*sp*dt,s[1]+d[1]/l*sp*dt,s[2]+d[2]/l*sp*dt]; },
+    Arrive: function(s, t, sp, sr, dt) { var d=[t[0]-s[0],t[1]-s[1],t[2]-s[2]]; var dist=Math.hypot(d[0],d[1],d[2]); if(dist<0.1)return s; var v=dist<sr?sp*(dist/sr):sp; var l=dist||1; return [s[0]+d[0]/l*v*dt,s[1]+d[1]/l*v*dt,s[2]+d[2]/l*v*dt]; },
+    Chase: function(s, t, sp, dt) { return AI.Seek(s,t,sp,dt); },
+    Flee: function(s, th, sp, dt, pd) { pd=pd||Infinity; var d=[s[0]-th[0],s[1]-th[1],s[2]-th[2]]; var dist=Math.hypot(d[0],d[1],d[2]); if(dist>pd)return s; var l=dist||1; return [s[0]+d[0]/l*sp*dt,s[1]+d[1]/l*sp*dt,s[2]+d[2]/l*sp*dt]; },
+    Patrol: function(s, wps, idx, sp, dt) { var wp=wps[idx%wps.length]; var np=AI.Arrive(s,wp,sp,1,dt); var dist=Math.hypot(np[0]-wp[0],np[1]-wp[1],np[2]-wp[2]); return {position:np,next:dist<0.5?(idx+1)%wps.length:idx}; },
+    CanSee: function(sp, sf, tp, fov, range, rf) { var d=[tp[0]-sp[0],tp[1]-sp[1],tp[2]-sp[2]]; var dist=Math.hypot(d[0],d[1],d[2]); if(dist>range)return false; if(dist<0.01)return true; var dot=d[0]/dist*sf[0]+d[1]/dist*sf[1]+d[2]/dist*sf[2]; var ang=Math.acos(Math.max(-1,Math.min(1,dot)))*180/Math.PI; if(ang>fov/2)return false; if(rf){var hit=rf(sp,d,dist); if(hit)return false;} return true; },
+    CanHear: function(sp, src, range) { return Math.hypot(src[0]-sp[0],src[1]-sp[1],src[2]-sp[2])<=range; },
+    Wander: function(s, c, r, sp, dt) { var a=Math.random()*Math.PI*2; var rad=Math.random()*r; var t=[c[0]+Math.cos(a)*rad,c[1],c[2]+Math.sin(a)*rad]; return AI.Seek(s,t,sp,dt); },
+    Sequence: function() { var ns=Array.from(arguments); return {run:function(ctx){for(var i=0;i<ns.length;i++){if(!ns[i].run(ctx))return false;}return true;}}; },
+    Selector: function() { var ns=Array.from(arguments); return {run:function(ctx){for(var i=0;i<ns.length;i++){if(ns[i].run(ctx))return true;}return false;}}; },
+    Condition: function(fn) { return {run:function(ctx){return fn(ctx)}}; },
+    Action: function(fn) { return {run:function(ctx){fn(ctx);return true}}; },
+  };
+  var Particles = {
+    Create: function(c) { c=c||{}; return {particles:[],maxCount:c.maxCount||200,life:c.life||1,speed:c.speed||2,size:c.size||0.1,color:c.color||[1,1,1,1],gravity:c.gravity||0,spread:c.spread||Math.PI*2,rate:c.rate||10,_emitAcc:0}; },
+    Emit: function(sys, pos, dt) { if(!sys)return; sys._emitAcc+=sys.rate*dt; while(sys._emitAcc>=1&&sys.particles.length<sys.maxCount){sys._emitAcc-=1; var a=Math.random()*sys.spread; var el=(Math.random()-0.5)*Math.PI; var s=sys.speed*(0.5+Math.random()*0.5); sys.particles.push({position:[pos[0],pos[1],pos[2]],velocity:[Math.cos(a)*Math.cos(el)*s,Math.sin(el)*s,Math.sin(a)*Math.cos(el)*s],life:sys.life*(0.5+Math.random()*0.5),maxLife:sys.life,size:sys.size*(0.5+Math.random()*0.5)});} },
+    Burst: function(sys, pos, count) { count=count||20; if(!sys)return; for(var i=0;i<count&&sys.particles.length<sys.maxCount;i++){var a=Math.random()*Math.PI*2; var el=(Math.random()-0.5)*Math.PI; var s=sys.speed*(0.5+Math.random()*0.5); sys.particles.push({position:[pos[0],pos[1],pos[2]],velocity:[Math.cos(a)*Math.cos(el)*s,Math.sin(el)*s,Math.sin(a)*Math.cos(el)*s],life:sys.life*(0.5+Math.random()*0.5),maxLife:sys.life,size:sys.size*(0.5+Math.random()*0.5)});} },
+    Update: function(sys, dt) { if(!sys)return []; var alive=[]; sys.particles=sys.particles.filter(function(p){p.life-=dt; if(p.life<=0)return false; p.velocity[1]-=sys.gravity*dt; p.position[0]+=p.velocity[0]*dt; p.position[1]+=p.velocity[1]*dt; p.position[2]+=p.velocity[2]*dt; alive.push({position:p.position,size:p.size*(p.life/p.maxLife),alpha:p.life/p.maxLife}); return true;}); return alive; },
+  };
+  var ObjectPool = { pools:{}, Create:function(n,f,c){c=c||10;var p={factory:f,active:[],inactive:[]};for(var i=0;i<c;i++)p.inactive.push(f());ObjectPool.pools[n]=p;return p;}, Spawn:function(n){var p=ObjectPool.pools[n];if(!p)return null;var o=p.inactive.pop()||p.factory();p.active.push(o);return o;}, Despawn:function(n,o){var p=ObjectPool.pools[n];if(!p)return;var i=p.active.indexOf(o);if(i>=0){p.active.splice(i,1);p.inactive.push(o);}}, DespawnAll:function(n){var p=ObjectPool.pools[n];if(!p)return;var a=p.active;p.inactive.push.apply(p.inactive,a);p.active=[];}, GetActive:function(n){return ObjectPool.pools[n]?ObjectPool.pools[n].active:[];} };
+  var Inventory = { items:{}, Add:function(n,c){c=c||1;Inventory.items[n]=(Inventory.items[n]||0)+c;}, Remove:function(n,c){c=c||1;if(!Inventory.items[n]||Inventory.items[n]<c)return false;Inventory.items[n]-=c;if(Inventory.items[n]<=0)delete Inventory.items[n];return true;}, Has:function(n,c){c=c||1;return(Inventory.items[n]||0)>=c;}, Count:function(n){return Inventory.items[n]||0;}, Clear:function(){Inventory.items={};}, GetAll:function(){return Object.assign({},Inventory.items);}, Save:function(k){k=k||'inventory';try{localStorage.setItem(k,JSON.stringify(Inventory.items));}catch(e){}}, Load:function(k){k=k||'inventory';try{var d=localStorage.getItem(k);if(d)Inventory.items=JSON.parse(d);}catch(e){}} };
+  var GameMode = { mode:'free',state:'idle',tagged:null,infected:[],players:[],timer:0,roundDuration:300, SetMode:function(m){GameMode.mode=m;}, StartRound:function(d){d=d||300;GameMode.state='playing';GameMode.timer=0;GameMode.roundDuration=d;GameMode.infected=[];}, EndRound:function(){GameMode.state='ended';}, Reset:function(){GameMode.state='idle';GameMode.tagged=null;GameMode.infected=[];GameMode.timer=0;}, Tag:function(tg,tt){if(GameMode.mode==='tag'){GameMode.tagged=tt;return true;}if(GameMode.mode==='infection'){if(GameMode.infected.indexOf(tt)<0)GameMode.infected.push(tt);return true;}return false;}, IsTagged:function(p){return GameMode.mode==='tag'?GameMode.tagged===p:GameMode.infected.indexOf(p)>=0;}, Tick:function(dt){if(GameMode.state!=='playing')return;GameMode.timer+=dt;if(GameMode.timer>=GameMode.roundDuration)GameMode.EndRound();}, AddPlayer:function(id){if(GameMode.players.indexOf(id)<0)GameMode.players.push(id);}, RemovePlayer:function(id){GameMode.players=GameMode.players.filter(function(p){return p!==id;});} };
+  Object.defineProperty(GameMode,'timeRemaining',{get:function(){return Math.max(0,GameMode.roundDuration-GameMode.timer);}});
+  var Triggers = { _triggers:[], Box:function(c,s,se,sx){var t={type:'box',center:c,size:s,onEnter:se,onExit:sx,_inside:new Set()};Triggers._triggers.push(t);return t;}, Sphere:function(c,r,se,sx){var t={type:'sphere',center:c,radius:r,onEnter:se,onExit:sx,_inside:new Set()};Triggers._triggers.push(t);return t;}, Remove:function(t){Triggers._triggers=Triggers._triggers.filter(function(x){return x!==t;});}, Update:function(objects){Triggers._triggers.forEach(function(t){var ni=new Set();Object.keys(objects).forEach(function(id){var pos=objects[id];var ins=false;if(t.type==='box'){ins=Math.abs(pos[0]-t.center[0])<=t.size[0]/2&&Math.abs(pos[1]-t.center[1])<=t.size[1]/2&&Math.abs(pos[2]-t.center[2])<=t.size[2]/2;}else if(t.type==='sphere'){ins=Math.hypot(pos[0]-t.center[0],pos[1]-t.center[1],pos[2]-t.center[2])<=t.radius;}if(ins)ni.add(id);if(ins&&!t._inside.has(id)&&t.onEnter)t.onEnter(id);if(!ins&&t._inside.has(id)&&t.onExit)t.onExit(id);});t._inside=ni;});}, Clear:function(){Triggers._triggers=[];} };
+  var WaveSpawner = { Create:function(c){c=c||{};return {waves:c.waves||[],currentWave:0,timer:0,state:'idle',spawnFn:c.spawnFn||function(){},delayBetweenWaves:c.delay||5,_enemiesAlive:0,_enemiesToSpawn:0,_spawnTimer:0};}, Start:function(s){s.state='spawning';s.currentWave=0;s.timer=0;s._enemiesToSpawn=s.waves[0]?s.waves[0].count:0;s._spawnTimer=0;}, Update:function(s,dt){if(s.state!=='spawning'&&s.state!=='waiting')return;if(s.state==='waiting'){s.timer+=dt;if(s.timer>=s.delayBetweenWaves){s.currentWave++;if(s.currentWave>=s.waves.length){s.state='complete';return;}s._enemiesToSpawn=s.waves[s.currentWave].count;s._spawnTimer=0;s.state='spawning';}return;}if(s._enemiesToSpawn>0){s._spawnTimer+=dt;var iv=s.waves[s.currentWave].interval||1;if(s._spawnTimer>=iv){s._spawnTimer=0;s.spawnFn(s.currentWave,s.waves[s.currentWave]);s._enemiesToSpawn--;s._enemiesAlive++;}}else if(s._enemiesAlive<=0){s.state='waiting';s.timer=0;}}, EnemyKilled:function(s){s._enemiesAlive=Math.max(0,s._enemiesAlive-1);} };
+  var DayNight = { time:8, speed:0.5, Update:function(dt){DayNight.time=(DayNight.time+DayNight.speed*dt)%24;}, SetTime:function(h){DayNight.time=h%24;} };
+  Object.defineProperty(DayNight,'isDay',{get:function(){return DayNight.time>=6&&DayNight.time<18;}});
+  Object.defineProperty(DayNight,'isNight',{get:function(){return DayNight.time<6||DayNight.time>=18;}});
+  Object.defineProperty(DayNight,'normalized',{get:function(){return DayNight.time/24;}});
+  Object.defineProperty(DayNight,'sunDirection',{get:function(){var a=(DayNight.time-6)/12*Math.PI;return [Math.cos(a),Math.sin(a),0.3];}});
+  Object.defineProperty(DayNight,'sunIntensity',{get:function(){var h=DayNight.time;if(h<5||h>19)return 0;if(h<7)return (h-5)/2;if(h>17)return (19-h)/2;return 1;}});
+
+
+  // ---- Physics ----
+  var _raycaster = new THREE.Raycaster();
+  var Physics = {
+    Raycast: function(origin, direction, maxDistance) {
+      maxDistance = maxDistance || Infinity;
+      _raycaster.set(new THREE.Vector3(origin[0],origin[1],origin[2]), new THREE.Vector3(direction[0],direction[1],direction[2]).normalize());
+      _raycaster.far = maxDistance;
+      var hits = _raycaster.intersectObjects(Object.values(meshes), true);
+      if (!hits.length) return null;
+      var hit = hits[0]; var obj = hit.object;
+      while (obj && !obj.userData.id) obj = obj.parent;
+      return { point: [hit.point.x, hit.point.y, hit.point.z], distance: hit.distance, normal: hit.face ? [hit.face.normal.x, hit.face.normal.y, hit.face.normal.z] : [0,1,0], transform: obj && obj.userData.id ? makeTransform(meshes[obj.userData.id]) : null, collider: obj && obj.userData.id ? obj.userData.id : null, rigidbody: null };
+    },
+    RaycastAll: function(origin, direction, maxDistance) {
+      maxDistance = maxDistance || Infinity;
+      _raycaster.set(new THREE.Vector3(origin[0],origin[1],origin[2]), new THREE.Vector3(direction[0],direction[1],direction[2]).normalize());
+      _raycaster.far = maxDistance;
+      var hits = _raycaster.intersectObjects(Object.values(meshes), true);
+      return hits.map(function(hit) { return { point: [hit.point.x, hit.point.y, hit.point.z], distance: hit.distance, normal: hit.face ? [hit.face.normal.x, hit.face.normal.y, hit.face.normal.z] : [0,1,0] }; });
+    },
+    OverlapSphere: function(center, radius) {
+      var results = []; var c = new THREE.Vector3(center[0], center[1], center[2]);
+      Object.keys(meshes).forEach(function(id) {
+        var mesh = meshes[id]; var box = new THREE.Box3().setFromObject(mesh);
+        if (box.isEmpty()) return;
+        var closest = new THREE.Vector3(Math.max(box.min.x, Math.min(c.x, box.max.x)), Math.max(box.min.y, Math.min(c.y, box.max.y)), Math.max(box.min.z, Math.min(c.z, box.max.z)));
+        if (closest.distanceTo(c) <= radius) results.push(makeTransform(mesh));
+      });
+      return results;
+    },
+    CheckSphere: function(position, radius) {
+      var c = new THREE.Vector3(position[0], position[1], position[2]);
+      for (var id in meshes) { var mesh = meshes[id]; var box = new THREE.Box3().setFromObject(mesh); if (box.isEmpty()) continue;
+        var closest = new THREE.Vector3(Math.max(box.min.x, Math.min(c.x, box.max.x)), Math.max(box.min.y, Math.min(c.y, box.max.y)), Math.max(box.min.z, Math.min(c.z, box.max.z)));
+        if (closest.distanceTo(c) <= radius) return true; }
+      return false;
+    },
+    gravity: [0, -9.8, 0],
+    SphereCast: function(origin, radius, direction, maxDistance) {
+      maxDistance = maxDistance || Infinity;
+      _raycaster.set(new THREE.Vector3(origin[0],origin[1],origin[2]), new THREE.Vector3(direction[0],direction[1],direction[2]).normalize());
+      _raycaster.far = maxDistance;
+      var hits = _raycaster.intersectObjects(Object.values(meshes), true);
+      if (!hits.length) return null;
+      var hit = hits[0]; var obj = hit.object;
+      while (obj && !obj.userData.id) obj = obj.parent;
+      return { point: [hit.point.x, hit.point.y, hit.point.z], distance: hit.distance, normal: hit.face ? [hit.face.normal.x, hit.face.normal.y, hit.face.normal.z] : [0,1,0], transform: obj && obj.userData.id ? makeTransform(meshes[obj.userData.id]) : null };
+    },
+    BoxCast: function(center, halfExtents, direction, maxDistance) { return Physics.Raycast(center, direction, maxDistance); },
+    CapsuleCast: function(p1, p2, radius, direction, maxDistance) { return Physics.Raycast(p1, direction, maxDistance); },
+    Linecast: function(start, end) { var dir = [end[0]-start[0], end[1]-start[1], end[2]-start[2]]; var dist = Math.hypot(dir[0], dir[1], dir[2]); return Physics.Raycast(start, dir, dist) === null; },
+    OverlapBox: function(center, halfExtents) { return Physics.OverlapSphere(center, Math.max(halfExtents[0]||0, halfExtents[1]||0, halfExtents[2]||0)); },
+    OverlapCapsule: function(p0, p1, radius) { return Physics.OverlapSphere(p0, radius); },
+    ClosestPoint: function(point, position, rotation, size) { return point; },
+    IgnoreCollision: function() {}, IgnoreLayerCollision: function() {},
+    Handcast: function(hand, direction, maxDistance) { var hd = hand === 'left' ? vrInput.leftHand : vrInput.rightHand; if (!hd) return null; return Physics.Raycast(hd.position, direction || [0,0,-1], maxDistance || 0.5); },
+    HandcastAll: function(hand, direction, maxDistance) { var hd = hand === 'left' ? vrInput.leftHand : vrInput.rightHand; if (!hd) return []; return Physics.RaycastAll(hd.position, direction || [0,0,-1], maxDistance || 0.5); },
+  };
+
+  // ---- Camera ----
+  var Camera = {
+    main: {
+      transform: makeTransform(camera),
+      get fieldOfView() { return camera.fov; }, set fieldOfView(v) { camera.fov = v; camera.updateProjectionMatrix(); },
+      get nearClipPlane() { return camera.near; }, set nearClipPlane(v) { camera.near = v; camera.updateProjectionMatrix(); },
+      get farClipPlane() { return camera.far; }, set farClipPlane(v) { camera.far = v; camera.updateProjectionMatrix(); },
+      WorldToScreenPoint: function(wp) { var v = new THREE.Vector3(wp[0],wp[1],wp[2]).project(camera); return [(v.x+1)/2*innerWidth, (1-(v.y+1)/2)*innerHeight, v.z]; },
+      ScreenToWorldPoint: function(sp) { var x = (sp[0]/innerWidth)*2-1; var y = -((sp[1]/innerHeight)*2-1); var v = new THREE.Vector3(x, y, sp[2]||0.5).unproject(camera); return [v.x, v.y, v.z]; },
+      ViewportToScreenPoint: function(vp) { return [vp[0]*innerWidth, vp[1]*innerHeight]; },
+      ScreenToViewportPoint: function(sp) { return [sp[0]/innerWidth, sp[1]/innerHeight]; },
+    },
+    current: null,
+  };
+
+  // ---- GameObject ----
+  var GameObject = {
+    Find: null, CreatePrimitive: function(type) {
+      var t = (type||'Cube').toLowerCase(); var geo;
+      if (t === 'cube' || t === 'box') geo = new THREE.BoxGeometry(1,1,1);
+      else if (t === 'sphere') geo = new THREE.SphereGeometry(0.5, 32, 32);
+      else if (t === 'cylinder') geo = new THREE.CylinderGeometry(0.5, 0.5, 1, 32);
+      else if (t === 'plane') geo = new THREE.PlaneGeometry(1, 1);
+      else if (t === 'capsule') geo = new THREE.CapsuleGeometry(0.5, 1, 8, 16);
+      else if (t === 'quad') geo = new THREE.PlaneGeometry(1, 1);
+      else return null;
+      var mat = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.6 });
+      var m = new THREE.Mesh(geo, mat); m.castShadow = true; m.receiveShadow = true; scene.add(m);
+      return makeTransform(m);
+    },
+    Destroy: function(obj, t) { if (!obj) return; var tm = obj._mesh || obj; if (!tm || !tm.parent) return; if (t > 0) { setTimeout(function() { try { tm.parent.remove(tm); } catch(e) {} }, t*1000); } else { try { tm.parent.remove(tm); } catch(e) {} } },
+    Instantiate: function(original, position, rotation) {
+      if (!original || !original._mesh) return null;
+      var m = original._mesh.clone();
+      if (original._mesh.material && original._mesh.material.clone) m.material = original._mesh.material.clone();
+      if (position) m.position.set(position[0], position[1], position[2]);
+      if (rotation) m.rotation.set(rotation[0], rotation[1], rotation[2]);
+      m.castShadow = true; m.receiveShadow = true; scene.add(m); return makeTransform(m);
+    },
+    FindWithTag: null, FindObjectOfType: function() { return null; }, FindObjectsOfType: function() { return []; },
+  };
+
+  // ---- Keyframe Animation Runtime ----
+  var _lp = function(a, b, t) { return a + (b - a) * t; };
+  function _sk(kfs, t) { if (!kfs || !kfs.length) return null; var ks = kfs.slice().sort(function(a, b) { return a.time - b.time; }); if (t <= ks[0].time) return { position: ks[0].position.slice(), rotation: ks[0].rotation.slice(), scale: ks[0].scale.slice() }; var l = ks[ks.length - 1]; if (t >= l.time) return { position: l.position.slice(), rotation: l.rotation.slice(), scale: l.scale.slice() }; for (var i = 0; i < ks.length - 1; i++) { if (t >= ks[i].time && t <= ks[i+1].time) { var tt = (t - ks[i].time) / ((ks[i+1].time - ks[i].time) || 1); return { position: [_lp(ks[i].position[0], ks[i+1].position[0], tt), _lp(ks[i].position[1], ks[i+1].position[1], tt), _lp(ks[i].position[2], ks[i+1].position[2], tt)], rotation: [_lp(ks[i].rotation[0], ks[i+1].rotation[0], tt), _lp(ks[i].rotation[1], ks[i+1].rotation[1], tt), _lp(ks[i].rotation[2], ks[i+1].rotation[2], tt)], scale: [_lp(ks[i].scale[0], ks[i+1].scale[0], tt), _lp(ks[i].scale[1], ks[i+1].scale[1], tt), _lp(ks[i].scale[2], ks[i+1].scale[2], tt)] }; } } return null; }
+  var animations = {};
+  DATA.forEach(function(o) { if (o.animation && o.animation.keyframes && o.animation.keyframes.length && meshes[o.id]) { (function(o2) { var m = meshes[o2.id]; var ct = 0; var playing = o2.animation.playOnStart; animations[o2.id] = { play: function() { ct = 0; playing = true; }, stop: function() { playing = false; }, pause: function() { playing = false; }, resume: function() { playing = true; }, isPlaying: function() { return playing; }, update: function(dt) { if (!playing) return; var dur = o2.animation.duration || 1; ct += dt; if (ct >= dur) { if (o2.animation.loop) { ct = ct % dur; } else { playing = false; return; } } var s = _sk(o2.animation.keyframes, ct); if (s) { m.position.set(s.position[0], s.position[1], s.position[2]); m.rotation.set(s.rotation[0], s.rotation[1], s.rotation[2]); m.scale.set(s.scale[0], s.scale[1], s.scale[2]); } } }; })(o); } });
+
+  var find = function(name) { var o = DATA.find(function(x) { return x.name === name; }); if (!o || !meshes[o.id]) return null; return makeTransform(meshes[o.id]); };
+  GameObject.Find = find;
+  GameObject.FindWithTag = function(tag) { var o = DATA.find(function(x) { return (x.tag || 'Untagged') === tag; }); if (!o || !meshes[o.id]) return null; return makeTransform(meshes[o.id]); };
+  const entries = [];
+  const rbVelocities = {};
+  SCRIPTS.forEach((s) => {
+    const mesh = meshes[s.id]; if (!mesh) return;
+    const transform = makeTransform(mesh);
+    const Time = { delta: 0, elapsed: 0, time: 0, timeSinceLevelLoad: 0, unscaledTime: 0, unscaledDeltaTime: 0, fixedTime: 0, fixedDeltaTime: 0.02, smoothDeltaTime: 0, frameCount: 0, renderedFrameCount: 0, realtimeSinceStartup: 0, timeScale: 1, maximumDeltaTime: 0.333, maximumParticleDeltaTime: 0.033, inFixedTimeStep: true, captureFramerate: 0 };
+    var oData = DATA.find((o) => o.id === s.id);
+    var renderer = {
+      get enabled() { return mesh.visible; }, set enabled(v) { mesh.visible = v; },
+      get isVisible() { return mesh.visible; },
+      get material() {
+        if (!mesh.material) return null;
+        var mat = mesh.material;
+        return {
+          get color() { var c = mat.color; return [c.r, c.g, c.b, 1]; },
+          set color(val) { if (Array.isArray(val)) { mat.color.setRGB(val[0]||0, val[1]||0, val[2]||0); if (val[3] != null) { mat.transparent = val[3] < 1; mat.opacity = val[3]; } } else mat.color.set(val); },
+          get name() { return mat.name || ''; }, set name(v) { mat.name = v; },
+          get mainTexture() { return mat.map || null; }, set mainTexture(v) { mat.map = v; mat.needsUpdate = true; },
+          get mainTextureOffset() { return mat.map ? [mat.map.offset.x, mat.map.offset.y] : [0, 0]; }, set mainTextureOffset(v) { if (mat.map) mat.map.offset.set(v[0]||0, v[1]||0); },
+          get mainTextureScale() { return mat.map ? [mat.map.repeat.x, mat.map.repeat.y] : [1, 1]; }, set mainTextureScale(v) { if (mat.map) mat.map.repeat.set(v[0]||1, v[1]||1); },
+          SetColor: function(name, color) { if (name === '_EmissionColor' && mat.emissive) mat.emissive.setRGB(color[0]||0, color[1]||0, color[2]||0); else mat.color.setRGB(color[0]||0, color[1]||0, color[2]||0); },
+          GetColor: function(name) { var c = mat.color; return [c.r, c.g, c.b, 1]; },
+          SetFloat: function(name, value) { if (name === '_Glossiness' || name === '_Smoothness') mat.roughness = 1 - value; else if (name === '_Metallic') mat.metalness = value; },
+          GetFloat: function(name) { if (name === '_Glossiness' || name === '_Smoothness') return 1 - (mat.roughness || 0); if (name === '_Metallic') return mat.metalness || 0; return 0; },
+          SetTexture: function(name, tex) { if (name === '_MainTex') { mat.map = tex; mat.needsUpdate = true; } },
+          GetTexture: function(name) { if (name === '_MainTex') return mat.map; return null; },
+          SetVector: function() {}, GetVector: function() { return [0,0,0,0]; },
+          GetTextureOffset: function(name) { return mat.map ? [mat.map.offset.x, mat.map.offset.y] : [0, 0]; },
+          SetTextureOffset: function(name, v) { if (mat.map) mat.map.offset.set(v[0]||0, v[1]||0); },
+          GetTextureScale: function(name) { return mat.map ? [mat.map.repeat.x, mat.map.repeat.y] : [1, 1]; },
+          SetTextureScale: function(name, v) { if (mat.map) mat.map.repeat.set(v[0]||1, v[1]||1); },
+          get shader() { return { name: 'Standard' }; },
+          get renderQueue() { return 2000; },
+          EnableKeyword: function() {}, DisableKeyword: function() {}, IsKeywordEnabled: function() { return false; },
+        };
+      },
+      get materials() { return [renderer.material]; },
+      get sharedMaterial() { return renderer.material; },
+    };
+    var lightObj = mesh.userData && mesh.userData.light;
+    var Light = lightObj ? {
+      get type() { return 1; },
+      get color() { var c = lightObj.color; return [c.r, c.g, c.b, 1]; },
+      set color(val) { if (Array.isArray(val)) lightObj.color.setRGB(val[0]||0, val[1]||0, val[2]||0); else lightObj.color.set(val); },
+      get intensity() { return lightObj.intensity; }, set intensity(v) { lightObj.intensity = v; },
+      get range() { return lightObj.shadow ? lightObj.shadow.camera.far : 50; },
+      set range(v) { if (lightObj.shadow) { lightObj.shadow.camera.far = v; lightObj.shadow.camera.updateProjectionMatrix(); } },
+      get enabled() { return lightObj.visible; }, set enabled(v) { lightObj.visible = v; },
+      get shadows() { return lightObj.castShadow; }, set shadows(v) { lightObj.castShadow = v; },
+    } : null;
+    var Rigidbody = {
+      get velocity() { return rbVelocities[s.id] || [0, 0, 0]; },
+      set velocity(v) { rbVelocities[s.id] = [v[0]||0, v[1]||0, v[2]||0]; },
+      get angularVelocity() { return rbVelocities[s.id + '_ang'] || [0, 0, 0]; },
+      set angularVelocity(v) { rbVelocities[s.id + '_ang'] = [v[0]||0, v[1]||0, v[2]||0]; },
+      get mass() { return (oData && oData._mass) || 1; }, set mass(v) { if (oData) oData._mass = v; },
+      get drag() { if (!oData || oData._drag == null) return 0.01; return oData._drag; }, set drag(v) { if (oData) oData._drag = v; },
+      get useGravity() { if (!oData) return true; return oData._useGravity !== false; }, set useGravity(v) { if (oData) oData._useGravity = v; },
+      get isKinematic() { return (oData && oData._isKinematic) || false; }, set isKinematic(v) { if (oData) oData._isKinematic = v; },
+      get position() { return transform.position; }, set position(v) { transform.position = v; },
+      get rotation() { return transform.rotation; }, set rotation(v) { transform.rotation = v; },
+      AddForce: function(force, mode) { var v = rbVelocities[s.id] || [0,0,0]; rbVelocities[s.id] = [v[0]+force[0], v[1]+force[1], v[2]+force[2]]; },
+      AddRelativeForce: function(force, mode) { var lf = transform.TransformDirection(force); Rigidbody.AddForce(lf, mode); },
+      AddTorque: function(torque, mode) { var v = rbVelocities[s.id+'_ang'] || [0,0,0]; rbVelocities[s.id+'_ang'] = [v[0]+torque[0], v[1]+torque[1], v[2]+torque[2]]; },
+      AddRelativeTorque: function(torque, mode) { Rigidbody.AddTorque(torque, mode); },
+      AddForceAtPosition: function(force, pos, mode) { Rigidbody.AddForce(force, mode); },
+      AddExplosionForce: function(force, pos, radius, uplift, mode) { var p = transform.position; var dir = [p[0]-pos[0], p[1]-pos[1], p[2]-pos[2]]; var dist = Math.hypot(dir[0],dir[1],dir[2]) || 1; if (dist > radius) return; var f = force * (1 - dist/radius); Rigidbody.AddForce([dir[0]/dist*f, dir[1]/dist*f + (uplift||0)*f, dir[2]/dist*f], mode); },
+      MovePosition: function(pos) { transform.position = pos; }, MoveRotation: function(rot) { transform.rotation = rot; },
+      Sleep: function() { if (oData) oData._sleeping = true; }, WakeUp: function() { if (oData) oData._sleeping = false; },
+      isSleeping: function() { return !!(oData && oData._sleeping); },
+      get freezeRotation() { return !!(oData && oData._freezeRotation); }, set freezeRotation(v) { if (oData) oData._freezeRotation = v; },
+    };
+    const gameObject = {
+      name: oData ? oData.name : s.name, active: oData ? (oData.active !== false) : true, tag: oData ? (oData.tag || 'Untagged') : 'Untagged',
+      SetActive: function(v) { mesh.visible = !!v; gameObject.active = !!v; },
+      CompareTag: function(t) { return gameObject.tag === t; },
+      GetComponent: function(type) { var tl = (type||'').toLowerCase(); if (tl === 'transform') return transform; if (tl === 'renderer') return renderer; if (tl === 'animation') return Animation; if (tl === 'animator') return Animator; if (tl === 'audio' || tl === 'audiosource') return AudioSource || Audio; if (tl === 'light') return Light; if (tl === 'rigidbody') return Rigidbody; return null; },
+      AddComponent: function() { return null; }, SendMessage: function() {}, _mesh: mesh,
+    };
+    var GetComponent = gameObject.GetComponent;
+    const ar = animations[s.id];
+    const Animation = ar ? { play: function() { ar.play(); }, stop: function() { ar.stop(); }, pause: function() { ar.pause(); }, resume: function() { ar.resume(); }, isPlaying: function() { return ar.isPlaying(); } } : null;
+    const Animator = ar ? { SetBool: function() {}, GetBool: function() { return false; }, SetTrigger: function() {}, SetFloat: function() {}, GetFloat: function() { return 0; }, SetInteger: function() {}, GetInteger: function() { return 0; }, Play: function() { ar.play(); }, Stop: function() { ar.stop(); }, CrossFade: function() { ar.play(); }, get isPlaying() { return ar.isPlaying(); }, get speed() { return 1; }, set speed(v) {} } : null;
+    var audioEl = audioElements[s.id];
+    var AudioSource = audioEl ? { Play: function() { try { audioEl.play(); } catch(e) {} }, Pause: function() { audioEl.pause(); }, Stop: function() { audioEl.pause(); audioEl.currentTime = 0; }, get pitch() { return audioEl.playbackRate || 1; }, set pitch(v) { audioEl.playbackRate = v; }, get volume() { return audioEl.volume; }, set volume(v) { audioEl.volume = Math.max(0, Math.min(1, v)); }, get loop() { return audioEl.loop; }, set loop(v) { audioEl.loop = v; }, get time() { return audioEl.currentTime; }, set time(v) { audioEl.currentTime = v; }, get isPlaying() { return !audioEl.paused; }, PlayOneShot: function() { audioEl.currentTime = 0; try { audioEl.play(); } catch(e) {} }, Play3D: function(pos) { try { audioEl.play(); } catch(e) {} } } : null;
+    try {
+      const fn = new Function('onStart', 'onUpdate', 'gameObject', 'transform', 'renderer', 'Time', 'Vector3', 'Vector2', 'Vector2Int', 'Vector3Int', 'Mathf', 'Random', 'KeyCode', 'Quaternion', 'Color', 'Color32', 'Bounds', 'Rect', 'LayerMask', 'World', 'Input', 'Physics', 'Debug', 'Screen', 'Camera', 'Animation', 'Animator', 'AudioSource', 'Audio', 'find', 'GameObject', 'GetComponent', 'PlayerPrefs', 'Application', 'SceneManager', 'Resources', 'JsonUtility', 'SystemInfo', 'QualitySettings', 'VR', 'Network', 'Procedural', 'NavMesh', 'AI', 'Particles', 'ObjectPool', 'Inventory', 'GameMode', 'Triggers', 'WaveSpawner', 'DayNight', 'StartCoroutine', 'StopCoroutine', 'StopAllCoroutines', 'WaitForSeconds', 'WaitForEndOfFrame', 'WaitForSecondsRealtime', 'WaitUntil', 'WaitWhile', 'Light', 'Rigidbody', s.code);
+      entries.push({ fn, transform, Time, gameObject, renderer, Animation, Animator, AudioSource, Audio, GetComponent, Light, Rigidbody, onStart: null, onUpdate: null, name: s.name });
+    } catch (e) { console.error('Script compile error [' + s.name + ']:', e); }
+  });
+  entries.forEach((e) => {
+    try {
+      e.fn((f) => { e.onStart = f; }, (f) => { e.onUpdate = f; }, e.gameObject, e.transform, e.renderer, e.Time, Vector3, Vector2, Vector2Int, Vector3Int, Mathf, Random, KeyCode, Quaternion, Color, Color32, Bounds, Rect, LayerMask, World, Input, Physics, Debug, Screen, Camera, e.Animation, e.Animator, e.AudioSource, e.Audio, find, GameObject, e.GetComponent, PlayerPrefs, Application, SceneManager, Resources, JsonUtility, SystemInfo, QualitySettings, VR, Network, Procedural, NavMesh, AI, Particles, ObjectPool, Inventory, GameMode, Triggers, WaveSpawner, DayNight, StartCoroutine, StopCoroutine, StopAllCoroutines, WaitForSeconds, WaitForEndOfFrame, WaitForSecondsRealtime, WaitUntil, WaitWhile, e.Light, e.Rigidbody);
+      if (e.onStart) e.onStart();
+    } catch (err) { console.error(err); }
+  });
+
+  const ctrl0 = renderer.xr.getController(0); const ctrl1 = renderer.xr.getController(1);
+  scene.add(ctrl0); scene.add(ctrl1);
+  const rig = {};
+  DATA.forEach((o) => { if (o.vrRole && meshes[o.id]) rig[o.vrRole] = meshes[o.id]; });
+
+  // ---- Physics ----
+  const SOLID = ['cube', 'sphere', 'cylinder', 'model'];
+  const velocities = {};
+  function stepPhysics(dt) {
+    if (!World || World.gravity === false || World.gravityObjects === false) return;
+    // Gravity is exactly the strength in m/s² (the hidden density multiplier is gone).
+    const g = World.gravityStrength ?? 9.8;
+    DATA.forEach((o) => {
+      if (!SOLID.includes(o.type) || o.vrRole || !o.physics) return;
+      const m = meshes[o.id]; if (!m) return;
+      const v = velocities[o.id] || (velocities[o.id] = [0, 0, 0]);
+      v[1] -= g * dt;
+      m.position.x += v[0] * dt; m.position.y += v[1] * dt; m.position.z += v[2] * dt;
+      if (World.collision) {
+        const halfH = ((o.scale && o.scale[1]) || 1) * 0.5;
+        if (m.position.y < halfH) { m.position.y = halfH; v[1] = 0; }
+      }
+    });
+  }
+
+  let vrActive = false;
+  const halfIPD = 0.032;
+  const leftCam = new THREE.PerspectiveCamera(camera.fov, 0.5, 0.1, 1000);
+  const rightCam = new THREE.PerspectiveCamera(camera.fov, 0.5, 0.1, 1000);
+  let pitch = rigObj ? (rigObj.rotation[0] || 0) : 0, roll = rigObj ? (rigObj.rotation[2] || 0) : 0;
+  let drag = false, px = 0, py = 0;
+
+  // Only X (pitch) and Z (roll) rotation — no yaw.
+  renderer.domElement.addEventListener('mousedown', (e) => { if (!vrActive) return; drag = true; px = e.clientX; py = e.clientY; });
+  window.addEventListener('mousemove', (e) => { if (!drag) return; pitch -= (e.clientY - py) * 0.005; pitch = Math.max(-1.2, Math.min(1.2, pitch)); py = e.clientY; });
+  window.addEventListener('mouseup', () => { drag = false; });
+  renderer.domElement.addEventListener('touchstart', (e) => { if (!vrActive) return; drag = true; px = e.touches[0].clientX; py = e.touches[0].clientY; }, { passive: true });
+  renderer.domElement.addEventListener('touchmove', (e) => { if (!drag) return; pitch -= (e.touches[0].clientY - py) * 0.005; pitch = Math.max(-1.2, Math.min(1.2, pitch)); py = e.touches[0].clientY; }, { passive: true });
+  renderer.domElement.addEventListener('touchend', () => { drag = false; }, { passive: true });
+
+  window.addEventListener('deviceorientation', (e) => {
+    if (e.beta == null && e.gamma == null) return;
+    if (e.beta != null) pitch = THREE.MathUtils.degToRad(Math.max(-60, Math.min(60, (e.beta || 0) - 90)));
+    if (e.gamma != null) roll = THREE.MathUtils.degToRad(Math.max(-40, Math.min(40, e.gamma || 0)));
+  });
+
+  const btn = document.createElement('button');
+  btn.textContent = 'Enter VR';
+  btn.style.cssText = 'position:fixed;top:12px;left:12px;z-index:10;padding:12px 20px;font:14px monospace;background:#2196f3;color:#fff;border:none;border-radius:10px;cursor:pointer;';
+  document.body.appendChild(btn);
+
+  const exitBtn = document.createElement('button');
+  exitBtn.textContent = 'Exit VR';
+  exitBtn.style.cssText = 'position:fixed;top:12px;right:12px;z-index:10;padding:8px 14px;font:12px monospace;background:rgba(0,0,0,0.5);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:8px;display:none;cursor:pointer;';
+  exitBtn.onclick = () => { ['head', 'body', 'leftHand', 'rightHand'].forEach(function(role) { if (rig[role] && rig.rig) rig.rig.attach(rig[role]); }); vrActive = false; exitBtn.style.display = 'none'; btn.style.display = 'block'; try { if (document.fullscreenElement) document.exitFullscreen(); } catch (e) {} };
+  document.body.appendChild(exitBtn);
+
+  const clock = new THREE.Clock();
+  var _vv = new THREE.Vector3(), _qq = new THREE.Quaternion(), _ss = new THREE.Vector3();
+  renderer.setAnimationLoop(() => {
+    const dt = Math.min(0.05, clock.getDelta()); const el = clock.elapsedTime;
+    if (renderer.xr.isPresenting) {
+      var session = renderer.xr.getSession(); var refSpace = renderer.xr.getReferenceSpace();
+      if (session && refSpace) {
+        vrInput.present = true;
+        var xrCam = renderer.xr.getCamera(); xrCam.matrixWorld.decompose(_vv, _qq, _ss);
+        vrInput.head.position = [_vv.x, _vv.y, _vv.z]; vrInput.head.rotation = [_qq.x, _qq.y, _qq.z, _qq.w];
+        for (var i = 0; i < session.inputSources.length; i++) {
+          var source = session.inputSources[i];
+          if (source.targetRayMode !== 'tracked-pointer') continue;
+          var hand = source.handedness === 'left' ? vrInput.leftHand : vrInput.rightHand;
+          if (source.gripSpace) { var pose = source.gripSpace.getPose(refSpace); if (pose) { var p = pose.transform.position, q = pose.transform.orientation; if (hand._lastPos && dt > 0) hand.velocity = [(p.x-hand._lastPos[0])/dt, (p.y-hand._lastPos[1])/dt, (p.z-hand._lastPos[2])/dt]; hand._lastPos = [p.x, p.y, p.z]; hand.position = [p.x, p.y, p.z]; hand.rotation = [q.x, q.y, q.z, q.w]; } }
+          if (source.gamepad) { var gp = source.gamepad; var ng = (gp.buttons[1] && gp.buttons[1].value || 0) > 0.1; var nt = (gp.buttons[0] && gp.buttons[0].value || 0) > 0.1; hand.gripDown = ng && !hand._prevGrip; hand.gripUp = !ng && hand._prevGrip; hand.triggerDown = nt && !hand._prevTrigger; hand.triggerUp = !nt && hand._prevTrigger; hand._prevGrip = ng; hand._prevTrigger = nt; hand.grip = ng; hand.trigger = nt; hand.thumbstick = [gp.axes[2] || 0, gp.axes[3] || 0]; hand.thumbstickDown = (gp.buttons[3] && gp.buttons[3].value || 0) > 0.1; }
+        }
+      }
+    } else { vrInput.present = false; }
+    var ts = (entries[0] && entries[0].Time.timeScale) || 1; var sdt = dt * ts;
+    entries.forEach((e) => { e.Time.delta = sdt; e.Time.elapsed = el; try { e.onUpdate && e.onUpdate(); } catch (err) { console.error(err); } });
+    Object.keys(rbVelocities).forEach(function(id) { if (id.endsWith('_ang')) return; var mesh = meshes[id]; if (!mesh) return; var od = DATA.find(function(o) { return o.id === id; }); if (!od || od._isKinematic || od._sleeping) return; var v = rbVelocities[id]; if (od._useGravity !== false) v[1] -= 9.8 * sdt; mesh.position.x += v[0] * sdt; mesh.position.y += v[1] * sdt; mesh.position.z += v[2] * sdt; if (mesh.position.y < 0) { mesh.position.y = 0; v[1] = Math.abs(v[1]) * 0.3; } var drag = (od._drag != null) ? od._drag : 0.01; v[0] *= (1 - drag); v[2] *= (1 - drag); if (Math.abs(v[0]) < 0.001) v[0] = 0; if (Math.abs(v[2]) < 0.001) v[2] = 0; });
+    for (var k in Input.keysPressed) delete Input.keysPressed[k];
+    for (var k in Input.keysReleased) delete Input.keysReleased[k];
+    for (var k in Input.mouseButtonsPressed) delete Input.mouseButtonsPressed[k];
+    for (var k in Input.mouseButtonsReleased) delete Input.mouseButtonsReleased[k];
+    Input.mouseDelta[0] = 0; Input.mouseDelta[1] = 0; Input.mouseWheel = 0;
+    vrInput.leftHand.gripDown = false; vrInput.leftHand.gripUp = false; vrInput.leftHand.triggerDown = false; vrInput.leftHand.triggerUp = false;
+    vrInput.rightHand.gripDown = false; vrInput.rightHand.gripUp = false; vrInput.rightHand.triggerDown = false; vrInput.rightHand.triggerUp = false;
+    entries.forEach(function(e) { e.Time.time = el; e.Time.timeSinceLevelLoad = el; e.Time.unscaledTime = el; e.Time.unscaledDeltaTime = dt; e.Time.fixedTime = el; e.Time.smoothDeltaTime = dt; e.Time.frameCount++; e.Time.renderedFrameCount++; e.Time.realtimeSinceStartup = el; });
+    if (animations) Object.keys(animations).forEach(function(id) { animations[id].update(dt); });
+    stepPhysics(dt);
+    if (skyMesh) {
+      if (renderer.xr.isPresenting) { skyMesh.position.setFromMatrixPosition(renderer.xr.getCamera().matrixWorld); }
+      else { skyMesh.position.copy(camera.position); }
+    }
+    if (renderer.xr.isPresenting) {
+      const xrCam = renderer.xr.getCamera();
+      const _v = new THREE.Vector3(), _q = new THREE.Quaternion(), _s = new THREE.Vector3();
+      const applyPose = (src, target) => {
+        if (!src || !target) return;
+        src.matrixWorld.decompose(_v, _q, _s);
+        target.position.copy(_v); target.quaternion.copy(_q);
+      };
+      if (rig.head) applyPose(xrCam, rig.head);
+      if (rig.leftHand && ctrl0) applyPose(ctrl0, rig.leftHand);
+      if (rig.rightHand && ctrl1) applyPose(ctrl1, rig.rightHand);
+      if (rig.body && rig.head) rig.body.position.set(rig.head.position.x, Math.max(0, rig.head.position.y - 0.7), rig.head.position.z);
+      renderer.render(scene, camera);
+    } else if (vrActive) {
+      camera.rotation.set(pitch, rigYaw, roll, 'YXZ');
+      const w = innerWidth, h = innerHeight, half = Math.floor(w / 2);
+      renderer.setScissorTest(true);
+      renderer.setViewport(0, 0, half, h); renderer.setScissor(0, 0, half, h);
+      leftCam.copy(camera); leftCam.translateX(-halfIPD); leftCam.aspect = half / h; leftCam.updateProjectionMatrix();
+      renderer.render(scene, leftCam);
+      renderer.setViewport(half, 0, half, h); renderer.setScissor(half, 0, half, h);
+      rightCam.copy(camera); rightCam.translateX(halfIPD); rightCam.aspect = half / h; rightCam.updateProjectionMatrix();
+      renderer.render(scene, rightCam);
+      renderer.setScissorTest(false);
+    } else {
+      camera.rotation.set(pitch, rigYaw, roll, 'YXZ');
+      renderer.render(scene, camera);
+    }
+  });
+
+  btn.onclick = async () => {
+    if (navigator.xr) {
+      try {
+        const s = await navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor'] });
+        await renderer.xr.setSession(s);
+        vrActive = true; btn.style.display = 'none'; exitBtn.style.display = 'block';
+        if (rigObj) {
+          const base = renderer.xr.getReferenceSpace();
+          const euler = new THREE.Euler(rigObj.rotation[0] || 0, 0, rigObj.rotation[2] || 0, 'XYZ');
+          const q = new THREE.Quaternion().setFromEuler(euler);
+          const pose = new XRRigidTransform({ x: rigObj.position[0] || 0, y: rigObj.position[1] || 0, z: rigObj.position[2] || 0 }, { x: q.x, y: q.y, z: q.z, w: q.w });
+          renderer.xr.setReferenceSpace(base.getOffsetReferenceSpace(pose));
+        }
+        ['head', 'body', 'leftHand', 'rightHand'].forEach(function(role) { if (rig[role]) scene.attach(rig[role]); });
+        return;
+      } catch (e) { /* fall through to stereo */ }
+    }
+    vrActive = true; btn.style.display = 'none'; exitBtn.style.display = 'block';
+    try { if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); } catch (e) {}
+    try { if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape'); } catch (e) {}
+  };
+
+  // Auto-enter stereoscopic VR on load for non-WebXR devices (e.g. Cardboard APK).
+  if (!navigator.xr) {
+    vrActive = true; btn.style.display = 'none'; exitBtn.style.display = 'block';
+    const tryFs = () => { try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } catch (e) {} try { screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape'); } catch (e) {} removeEventListener('touchend', tryFs); removeEventListener('click', tryFs); };
+    addEventListener('touchend', tryFs); addEventListener('click', tryFs);
+  }
+
+  addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+}
+if (typeof THREE !== 'undefined') init();
+</script>
+
+</body>
+</html>
