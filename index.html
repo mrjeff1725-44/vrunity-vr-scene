@@ -6,6 +6,18 @@
 <title>VR Scene</title>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0a0c12">
 <style> html,body { margin:0; height:100%; background:#0a0c12; overflow:hidden; font-family: ui-monospace, monospace; } canvas { display:block; } </style>
+<link rel="modulepreload" href="./three.module.min.js">
+<script>
+(function () {
+  const launch = { granted: false, onGranted: null };
+  window.__vrunityXrLaunch = launch;
+  if (!navigator.xr || !window.isSecureContext) return;
+  navigator.xr.addEventListener('sessiongranted', function () {
+    launch.granted = true;
+    if (launch.onGranted) launch.onGranted();
+  });
+})();
+</script>
 </head>
 <body>
 <script>
@@ -1243,7 +1255,7 @@ function init() {
   });
 
   (function configureWebSceneVr({ THREE, renderer, scene, rig, rigObj, btn, exitBtn, xrRuntime, onSessionChange, onError }) {
-  let session = null, requesting = false, supported = null, retryTimer = null, autoAttempts = 0;
+  let session = null, requesting = false, supported = null, retryTimer = null, autoAttempts = 0, pendingOffer = null;
   const MAX_AUTO_ATTEMPTS = 12;
   const parts = ['head', 'body', 'leftHand', 'rightHand'].map(role => rig[role]).filter(Boolean)
     .map(node => ({ node, parent: node.parent, position: node.position.clone(), quaternion: node.quaternion.clone(), scale: node.scale.clone() }));
@@ -1284,13 +1296,19 @@ function init() {
     showGate('This scene runs in VR only. Move a controller or touch the screen to step back in.', 'Enter VR', false);
   };
 
-  async function enterVR(automatic) {
-    if (requesting || session || supported === false || !navigator.xr) return;
+  async function enterVR(automatic, offeredSession) {
+    if (requesting || session || supported === false || !navigator.xr) {
+      if (offeredSession && offeredSession !== session) {
+        if (requesting && !session && supported !== false) pendingOffer = offeredSession;
+        else offeredSession.end().catch(onError);
+      }
+      return;
+    }
     requesting = true; gateBtn.disabled = true; gateBtn.textContent = 'Starting VR…';
     let created = null, ended = false;
     try {
       // Call before any await so a tap's user activation is preserved.
-      created = await navigator.xr.requestSession('immersive-vr', { requiredFeatures: ['local'], optionalFeatures: ['local-floor', 'hand-tracking'] });
+      created = offeredSession || await navigator.xr.requestSession('immersive-vr', { requiredFeatures: ['local'], optionalFeatures: ['local-floor', 'hand-tracking'] });
       session = created;
       created.addEventListener('end', () => {
         ended = true;
@@ -1337,6 +1355,10 @@ function init() {
     } finally {
       requesting = false;
       gateBtn.disabled = supported === false;
+      if (pendingOffer) {
+        const offered = pendingOffer; pendingOffer = null;
+        enterVR(true, offered);
+      }
     }
   }
 
@@ -1345,7 +1367,7 @@ function init() {
   // first touch, click or key press as the gesture some browsers still demand —
   // so the visitor never has to hunt for a button.
   const auto = () => {
-    if (session || requesting || supported !== true || autoAttempts >= MAX_AUTO_ATTEMPTS) return;
+    if (session || requesting || supported === false || autoAttempts >= MAX_AUTO_ATTEMPTS) return;
     autoAttempts++;
     enterVR(true);
   };
@@ -1353,13 +1375,19 @@ function init() {
     if (retryTimer || session || supported !== true || autoAttempts >= MAX_AUTO_ATTEMPTS) return;
     retryTimer = setTimeout(() => { retryTimer = null; auto(); }, 900 * autoAttempts);
   };
-  const firstGesture = () => { if (!session && supported === true) enterVR(false); };
+  const firstGesture = event => {
+    if (event.target === exitBtn) return;
+    if (!session && supported !== false) enterVR(false);
+  };
   gateBtn.onclick = () => enterVR(false);
   ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(type => window.addEventListener(type, firstGesture, { capture: true, passive: type !== 'keydown' }));
   // Headset wake-up, returning to the page, or a granted session all re-attempt.
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') auto(); });
   window.addEventListener('focus', auto);
-  if (navigator.xr && navigator.xr.addEventListener) navigator.xr.addEventListener('sessiongranted', auto);
+  const onGranted = () => { supported = true; autoAttempts = 0; enterVR(true); };
+  const launch = window.__vrunityXrLaunch;
+  if (launch) launch.onGranted = onGranted;
+  else if (navigator.xr) navigator.xr.addEventListener('sessiongranted', onGranted);
 
   exitBtn.onclick = async event => {
     event.stopPropagation();
@@ -1377,9 +1405,21 @@ function init() {
   // Lower XR framebuffer cost without resizing the canvas during a live session.
   renderer.xr.setFramebufferScaleFactor(0.85);
   renderer.xr.setFoveation(1);
-  showGate('This scene runs in VR only — setting up Immersive VR…', 'Preparing VR…', true);
+  showGate('Opening Immersive VR…', 'Starting VR…', true);
+  // Do not wait for the asynchronous support check before requesting entry.
+  // A headset's navigation grant can arrive before the engine is ready.
+  if (launch?.granted) onGranted();
+  else auto();
+  if (typeof navigator.xr.offerSession === 'function') {
+    // Let the browser launch directly into VR when it supports offered sessions.
+    // An outstanding offer must not block the manual entry fallback.
+    navigator.xr.offerSession('immersive-vr', { requiredFeatures: ['local'], optionalFeatures: ['local-floor', 'hand-tracking'] })
+      .then(offered => enterVR(true, offered))
+      .catch(() => {}); // Entry via requestSession remains available.
+  }
   navigator.xr.isSessionSupported('immersive-vr').then(ok => {
     supported = ok;
+    if (session || requesting) return;
     if (!ok) {
       showGate('This scene runs in VR only, and this browser does not support Immersive VR. Open the link in your headset browser.', 'VR not supported here', true);
       return;
