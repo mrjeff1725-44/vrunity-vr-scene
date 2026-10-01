@@ -42,7 +42,7 @@ function init() {
   console.error = function() { try { parent.postMessage({ type: 'vrunity-log', sev: 'error', msg: Array.from(arguments).map(String).join(' ') }, '*'); } catch (e) {} _origErr.apply(console, arguments); };
   window.addEventListener('error', (e) => { try { parent.postMessage({ type: 'vrunity-log', sev: 'error', msg: e.message }, '*'); } catch (x) {} });
 
-  const DATA = [{"id":"go0df5","name":"Ground","type":"plane","color":"#6b6665","position":[0,0,0],"rotation":[-1.5707963267948966,0,0],"scale":[10,10,1],"parentId":null,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go1df5","name":"Directional Light","type":"light","color":"#ffffff","position":[4,6,3],"rotation":[-1.05,0.52,0],"scale":[1,1,1],"parentId":null,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"intensity":1.3,"range":50,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go2df5","name":"VR Rig","type":"group","color":"#4C97FF","position":[0,0,0],"rotation":[0,0,0],"scale":[1,1,1],"parentId":null,"vrRole":"rig","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go6df5","name":"Head","type":"sphere","color":"#4fe0e0","position":[0,1.6,0],"rotation":[0,0,0],"scale":[0.14,0.16,0.14],"parentId":"go2df5","vrRole":"head","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go7df6","name":"Body","type":"cylinder","color":"#5a5a5a","position":[0,1,0],"rotation":[0,0,0],"scale":[0.22,0.55,0.22],"parentId":"go2df5","vrRole":"body","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go3df5","name":"Left Hand","type":"group","color":"#4fa3e8","position":[-0.35,1.2,-0.3],"rotation":[0,0,0],"scale":[1,1,1],"parentId":"go2df5","vrRole":"leftHand","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go4df5","name":"Right Hand","type":"group","color":"#4fa3e8","position":[0.35,1.2,-0.3],"rotation":[0,0,0],"scale":[1,1,1],"parentId":"go2df5","vrRole":"rightHand","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}}];
+  const DATA = [{"id":"go0d4l","name":"Ground","type":"plane","color":"#6b6665","position":[0,0,0],"rotation":[-1.5707963267948966,0,0],"scale":[10,10,1],"parentId":null,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go1d4l","name":"Directional Light","type":"light","color":"#ffffff","position":[4,6,3],"rotation":[-1.05,0.52,0],"scale":[1,1,1],"parentId":null,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"intensity":1.3,"range":50,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go2d4l","name":"VR Rig","type":"group","color":"#4C97FF","position":[0,0,0],"rotation":[0,0,0],"scale":[1,1,1],"parentId":null,"vrRole":"rig","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go6d4m","name":"Head","type":"sphere","color":"#4fe0e0","position":[0,1.6,0],"rotation":[0,0,0],"scale":[0.14,0.16,0.14],"parentId":"go2d4l","vrRole":"head","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go7d4m","name":"Body","type":"cylinder","color":"#5a5a5a","position":[0,1,0],"rotation":[0,0,0],"scale":[0.22,0.55,0.22],"parentId":"go2d4l","vrRole":"body","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go3d4l","name":"Left Hand","type":"group","color":"#4fa3e8","position":[-0.35,1.2,-0.3],"rotation":[0,0,0],"scale":[1,1,1],"parentId":"go2d4l","vrRole":"leftHand","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go4d4l","name":"Right Hand","type":"group","color":"#4fa3e8","position":[0.35,1.2,-0.3],"rotation":[0,0,0],"scale":[1,1,1],"parentId":"go2d4l","vrRole":"rightHand","audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}}];
   const SCRIPTS = [];
   const SKY = {"type":"procedural","topColor":"#1a5fa0","horizonColor":"#b0d0ee","sunDir":[0.3,0.8,0.2],"sunColor":"#fff8e0","sunSize":0.02,"starDensity":0,"hazeStrength":0.25,"sunGlow":1};
   const WORLD = {"gravity":true,"gravityStrength":9.8,"gravityPlayers":true,"gravityObjects":true,"density":1,"collision":true,"shadows":true,"ambientIntensity":0.35,"worldLight":true,"worldLightIntensity":1,"worldLightColor":"#ffffff","fog":false,"fogColor":"#9e9e9e","fogNear":10,"fogFar":60,"mpEnabled":false,"mpMaxPlayers":8,"mpPrivateCodes":false,"mpPortalObjectId":null,"mpPortalLeaveId":null,"mpPortalJoinPublicId":null,"mpPortalAssets":false,"mpMicrophone":false,"mpPushToTalk":false};
@@ -996,131 +996,159 @@ function init() {
   });
 
   (function configureWebSceneVr({ THREE, renderer, scene, rig, rigObj, btn, exitBtn, onSessionChange, onError }) {
-  let session = null, requesting = false, supported = null;
-  const parts = ['head', 'body', 'leftHand', 'rightHand'].map(role => rig[role]).filter(Boolean)
-    .map(node => ({ node, parent: node.parent, position: node.position.clone(), quaternion: node.quaternion.clone(), scale: node.scale.clone() }));
-
-  const gate = document.createElement('div');
-  gate.style.cssText = 'position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;background:#0a0c12;color:#e6e6e6;font:15px/1.6 ui-monospace,monospace;';
-  const heading = document.createElement('div');
-  heading.textContent = 'VR required';
-  heading.style.cssText = 'font-size:24px;font-weight:700;letter-spacing:0.08em;';
-  const status = document.createElement('div');
-  status.style.cssText = 'max-width:560px;color:#9aa4b2;';
-  const gateBtn = document.createElement('button');
-  gateBtn.textContent = 'Enter VR';
-  gateBtn.style.cssText = 'padding:16px 36px;font:16px ui-monospace,monospace;font-weight:700;background:#2196f3;color:#fff;border:none;border-radius:12px;cursor:pointer;';
-  gate.append(heading, status, gateBtn);
-  document.body.appendChild(gate);
-  btn.style.display = 'none';
-  exitBtn.style.display = 'none';
-
-  const showGate = (message, label, disabled) => {
-    status.textContent = message;
-    gateBtn.textContent = label;
-    gateBtn.disabled = Boolean(disabled);
-    gate.style.display = 'flex';
-    btn.style.display = 'none';
-  };
-
-  // Ending VR returns the visitor to the gate instead of leaving a flat scene open.
-  const restore = () => {
-    parts.forEach(({ node, parent, position, quaternion, scale }) => {
-      if (parent) parent.add(node);
-      node.position.copy(position); node.quaternion.copy(quaternion); node.scale.copy(scale);
-    });
-    onSessionChange(false);
-    exitBtn.style.display = 'none';
-    showGate('This scene runs in VR only. Tap Enter VR to step back in.', 'Enter VR', false);
-  };
-
-  async function enterVR(automatic) {
-    if (requesting || session || supported === false || !navigator.xr) return;
-    requesting = true; gateBtn.disabled = true; gateBtn.textContent = 'Starting VR…';
-    let created = null, ended = false;
-    try {
-      // Call before any await so a tap's user activation is preserved.
-      created = await navigator.xr.requestSession('immersive-vr', { requiredFeatures: ['local-floor'] });
-      session = created;
-      created.addEventListener('end', () => {
-        ended = true;
-        if (session === created) { session = null; restore(); }
-      }, { once: true });
-      await renderer.xr.setSession(created);
-      if (ended) return;
-      const base = renderer.xr.getReferenceSpace();
-      if (rigObj && base) {
-        const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, rigObj.rotation?.[1] || 0, 0)).invert();
-        const p = new THREE.Vector3().fromArray(rigObj.position || [0, 0, 0]).applyQuaternion(q).negate();
-        renderer.xr.setReferenceSpace(base.getOffsetReferenceSpace(new XRRigidTransform(
-          { x: p.x, y: p.y, z: p.z }, { x: q.x, y: q.y, z: q.z, w: q.w }
-        )));
-      }
-      parts.forEach(({ node }) => scene.attach(node));
-      onSessionChange(true);
-      gate.style.display = 'none';
-      exitBtn.style.display = 'block';
-    } catch (error) {
-      // Release a partially initialized session; never disguise a failure as stereo VR.
-      if (created && !ended) {
-        try { await created.end(); } catch (endError) { onError(endError); }
-      }
-      if (session === created) session = null;
-      if (automatic && ['SecurityError', 'NotAllowedError'].includes(error.name)) {
-        // Browsers that demand a tap: VR still starts on the visitor's next touch.
-        showGate('This scene runs in VR only. Tap Enter VR to start Immersive VR.', 'Enter VR', false);
-      } else {
-        showGate('Could not start VR: ' + (error.message || error), 'Retry Immersive VR', false);
-        onError('Could not enter VR: ' + (error.message || error));
-      }
-    } finally {
-      requesting = false;
-      gateBtn.disabled = supported === false;
-    }
-  }
-
-  // VR is automatic: any touch, click or key press starts the headset session.
-  const firstGesture = event => {
-    if (session || requesting || supported !== true) return;
-    if (event.type === 'keydown' && !['Enter', ' '].includes(event.key)) return;
-    enterVR(false);
-  };
-  gateBtn.onclick = () => enterVR(false);
-  window.addEventListener('click', firstGesture);
-  window.addEventListener('keydown', firstGesture);
-  window.addEventListener('touchstart', firstGesture, { passive: true });
-
-  exitBtn.onclick = async event => {
-    event.stopPropagation();
-    if (session) {
-      try { await session.end(); } catch (error) { onError('Could not leave VR: ' + error.message); }
-    }
-  };
-
-  if (!navigator.xr || !window.isSecureContext) {
-    supported = false;
-    showGate('This scene runs in VR only. Open the link in a WebXR headset browser — for example the browser inside your headset.', 'VR not available in this browser', true);
-    return;
-  }
-  renderer.xr.setReferenceSpaceType('local-floor');
-  // Lower XR framebuffer cost without resizing the canvas during a live session.
-  renderer.xr.setFramebufferScaleFactor(0.85);
-  renderer.xr.setFoveation(1);
-  showGate('This scene runs in VR only — setting up Immersive VR…', 'Preparing VR…', true);
-  navigator.xr.isSessionSupported('immersive-vr').then(ok => {
-    supported = ok;
-    if (!ok) {
-      showGate('This scene runs in VR only, and this browser does not support Immersive VR. Open the link in your headset browser.', 'VR not supported here', true);
-      return;
-    }
-    showGate('This scene runs in VR only — entering Immersive VR automatically.', 'Enter VR', false);
-    enterVR(true);
-  }).catch(error => {
-    showGate('Could not check VR support: ' + error.message, 'Retry Immersive VR', false);
-    onError('Could not check VR: ' + error.message);
-  });
+	let session = null, requesting = false, supported = null;
+	const parts = [
+		"head",
+		"body",
+		"leftHand",
+		"rightHand"
+	].map((role) => rig[role]).filter(Boolean).map((node) => ({
+		node,
+		parent: node.parent,
+		position: node.position.clone(),
+		quaternion: node.quaternion.clone(),
+		scale: node.scale.clone()
+	}));
+	const gate = document.createElement("div");
+	gate.style.cssText = "position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;background:#0a0c12;color:#e6e6e6;font:15px/1.6 ui-monospace,monospace;";
+	const heading = document.createElement("div");
+	heading.textContent = "VR required";
+	heading.style.cssText = "font-size:24px;font-weight:700;letter-spacing:0.08em;";
+	const status = document.createElement("div");
+	status.style.cssText = "max-width:560px;color:#9aa4b2;";
+	const gateBtn = document.createElement("button");
+	gateBtn.textContent = "Enter VR";
+	gateBtn.style.cssText = "padding:16px 36px;font:16px ui-monospace,monospace;font-weight:700;background:#2196f3;color:#fff;border:none;border-radius:12px;cursor:pointer;";
+	gate.append(heading, status, gateBtn);
+	document.body.appendChild(gate);
+	btn.style.display = "none";
+	exitBtn.style.display = "none";
+	const showGate = (message, label, disabled) => {
+		status.textContent = message;
+		gateBtn.textContent = label;
+		gateBtn.disabled = Boolean(disabled);
+		gate.style.display = "flex";
+		btn.style.display = "none";
+	};
+	// Ending VR returns the visitor to the gate instead of leaving a flat scene open.
+	const restore = () => {
+		parts.forEach(({ node, parent, position, quaternion, scale }) => {
+			if (parent) parent.add(node);
+			node.position.copy(position);
+			node.quaternion.copy(quaternion);
+			node.scale.copy(scale);
+		});
+		onSessionChange(false);
+		exitBtn.style.display = "none";
+		showGate("This scene runs in VR only. Tap Enter VR to step back in.", "Enter VR", false);
+	};
+	async function enterVR(automatic) {
+		if (requesting || session || supported === false || !navigator.xr) return;
+		requesting = true;
+		gateBtn.disabled = true;
+		gateBtn.textContent = "Starting VR…";
+		let created = null, ended = false;
+		try {
+			// Call before any await so a tap's user activation is preserved.
+			created = await navigator.xr.requestSession("immersive-vr", { requiredFeatures: ["local-floor"] });
+			session = created;
+			created.addEventListener("end", () => {
+				ended = true;
+				if (session === created) {
+					session = null;
+					restore();
+				}
+			}, { once: true });
+			await renderer.xr.setSession(created);
+			if (ended) return;
+			const base = renderer.xr.getReferenceSpace();
+			if (rigObj && base) {
+				const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, rigObj.rotation?.[1] || 0, 0)).invert();
+				const p = new THREE.Vector3().fromArray(rigObj.position || [
+					0,
+					0,
+					0
+				]).applyQuaternion(q).negate();
+				renderer.xr.setReferenceSpace(base.getOffsetReferenceSpace(new XRRigidTransform({
+					x: p.x,
+					y: p.y,
+					z: p.z
+				}, {
+					x: q.x,
+					y: q.y,
+					z: q.z,
+					w: q.w
+				})));
+			}
+			parts.forEach(({ node }) => scene.attach(node));
+			onSessionChange(true);
+			gate.style.display = "none";
+			exitBtn.style.display = "block";
+		} catch (error) {
+			// Release a partially initialized session; never disguise a failure as stereo VR.
+			if (created && !ended) {
+				try {
+					await created.end();
+				} catch (endError) {
+					onError(endError);
+				}
+			}
+			if (session === created) session = null;
+			if (automatic && ["SecurityError", "NotAllowedError"].includes(error.name)) {
+				// Browsers that demand a tap: VR still starts on the visitor's next touch.
+				showGate("This scene runs in VR only. Tap Enter VR to start Immersive VR.", "Enter VR", false);
+			} else {
+				showGate("Could not start VR: " + (error.message || error), "Retry Immersive VR", false);
+				onError("Could not enter VR: " + (error.message || error));
+			}
+		} finally {
+			requesting = false;
+			gateBtn.disabled = supported === false;
+		}
+	}
+	// VR is automatic: any touch, click or key press starts the headset session.
+	const firstGesture = (event) => {
+		if (session || requesting || supported !== true) return;
+		if (event.type === "keydown" && !["Enter", " "].includes(event.key)) return;
+		enterVR(false);
+	};
+	gateBtn.onclick = () => enterVR(false);
+	window.addEventListener("click", firstGesture);
+	window.addEventListener("keydown", firstGesture);
+	window.addEventListener("touchstart", firstGesture, { passive: true });
+	exitBtn.onclick = async (event) => {
+		event.stopPropagation();
+		if (session) {
+			try {
+				await session.end();
+			} catch (error) {
+				onError("Could not leave VR: " + error.message);
+			}
+		}
+	};
+	if (!navigator.xr || !window.isSecureContext) {
+		supported = false;
+		showGate("This scene runs in VR only. Open the link in a WebXR headset browser — for example the browser inside your headset.", "VR not available in this browser", true);
+		return;
+	}
+	renderer.xr.setReferenceSpaceType("local-floor");
+	// Lower XR framebuffer cost without resizing the canvas during a live session.
+	renderer.xr.setFramebufferScaleFactor(.85);
+	renderer.xr.setFoveation(1);
+	showGate("This scene runs in VR only — setting up Immersive VR…", "Preparing VR…", true);
+	navigator.xr.isSessionSupported("immersive-vr").then((ok) => {
+		supported = ok;
+		if (!ok) {
+			showGate("This scene runs in VR only, and this browser does not support Immersive VR. Open the link in your headset browser.", "VR not supported here", true);
+			return;
+		}
+		showGate("This scene runs in VR only — entering Immersive VR automatically.", "Enter VR", false);
+		enterVR(true);
+	}).catch((error) => {
+		showGate("Could not check VR support: " + error.message, "Retry Immersive VR", false);
+		onError("Could not check VR: " + error.message);
+	});
 })({ THREE, renderer, scene, rig, rigObj, btn, exitBtn, onSessionChange: function(value) { vrActive = value; }, onError: showSceneError });
-
   addEventListener('resize', () => {
     if (renderer.xr.isPresenting) return;
     camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight);
