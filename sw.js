@@ -1,5 +1,5 @@
 const PREFIX='vrunity-'+self.registration.scope;
-const C=PREFIX+"face-buttons-1790819411635";
+const C=PREFIX+"vr-1790819511751";
 const INDEX=new URL('./index.html',self.registration.scope).href;
 const FILES=['./','./index.html','./manifest.webmanifest','./icon.svg','./three.module.min.js','./three.core.min.js'];
 self.addEventListener('install',event=>{
