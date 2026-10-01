@@ -1,4 +1,34 @@
-const C='vr-1790816748924';
-self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(async c=>{for(const u of ['./','./index.html','./manifest.webmanifest','./icon.svg','./three.module.min.js','./three.core.min.js']){try{await c.add(u)}catch(err){}}}));});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));});
-self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const cl=res.clone();caches.open(C).then(c=>c.put(e.request,cl));return res;}).catch(()=>caches.match('./index.html'))));});
+const PREFIX='vrunity-'+self.registration.scope;
+const C=PREFIX+"startup-fix-1790817086564";
+const INDEX=new URL('./index.html',self.registration.scope).href;
+const FILES=['./','./index.html','./manifest.webmanifest','./icon.svg','./three.module.min.js','./three.core.min.js'];
+self.addEventListener('install',event=>{
+  self.skipWaiting();
+  event.waitUntil(caches.open(C).then(async cache=>{
+    await Promise.all(FILES.map(async file=>{try{await cache.add(file)}catch{}}));
+  }));
+});
+self.addEventListener('activate',event=>{
+  event.waitUntil((async()=>{
+    const keys=await caches.keys();
+    await Promise.all(keys.filter(key=>key.startsWith(PREFIX)&&key!==C).map(key=>caches.delete(key)));
+    await self.clients.claim();
+  })());
+});
+self.addEventListener('fetch',event=>{
+  const url=new URL(event.request.url);
+  if(event.request.method!=='GET'||url.origin!==self.location.origin||!url.pathname.startsWith(new URL(self.registration.scope).pathname))return;
+  event.respondWith((async()=>{
+    const cache=await caches.open(C);
+    try{
+      const response=await fetch(event.request);
+      if(response.ok){await cache.put(event.request,response.clone());if(event.request.mode==='navigate')await cache.put(INDEX,response.clone())}
+      return response;
+    }catch(error){
+      const cached=await cache.match(event.request);
+      if(cached)return cached;
+      if(event.request.mode==='navigate'){const page=await cache.match(INDEX);if(page)return page}
+      throw error;
+    }
+  })());
+});

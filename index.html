@@ -8,7 +8,33 @@
 <style> html,body { margin:0; height:100%; background:#0a0c12; overflow:hidden; font-family: ui-monospace, monospace; } canvas { display:block; } </style>
 </head>
 <body>
-<script type="module">let T;try{T=await import('./three.module.min.js')}catch(e){try{T=await import('https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.min.js')}catch(e2){document.body.innerHTML='<p style="color:#9a9a9a;padding:24px;font-family:monospace">Could not load the 3D engine — check the connection and reload.</p>'}}if(T){window.THREE=T;init()}</script>
+<script>
+function showSceneError(error) {
+  let el = document.getElementById('scene-error');
+  if (!el) {
+    el = document.createElement('p'); el.id = 'scene-error'; el.setAttribute('role', 'alert');
+    el.style.cssText = 'position:fixed;bottom:12px;left:12px;right:12px;z-index:20;padding:12px;background:#0a0c12;color:#c8c8c8;font:12px monospace;';
+    document.body.appendChild(el);
+  }
+  el.textContent = 'Scene error: ' + (error?.message || String(error));
+}
+addEventListener('error', e => showSceneError(e.error || e.message));
+addEventListener('unhandledrejection', e => showSceneError(e.reason));
+let sceneStarted = false;
+function startScene() {
+  if (sceneStarted) return;
+  sceneStarted = true;
+  try { init(); } catch (error) { showSceneError(error); }
+}
+</script><script type="module">
+try {
+  let engine;
+  try { engine = await import('./three.module.min.js'); }
+  catch { engine = await import('https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.min.js'); }
+  window.THREE = engine;
+  startScene();
+} catch (error) { showSceneError(error); }
+</script>
 <script>
 function init() {
   if (typeof THREE === 'undefined') return;
@@ -185,7 +211,7 @@ function init() {
     setLoop: function(name, loop) { var a = findAudio(name); if (a) a.loop = !!loop; },
   };
 
-  const Vector3 = {
+  let Vector3 = {
     up: [0, 1, 0], down: [0, -1, 0], left: [-1, 0, 0], right: [1, 0, 0],
     forward: [0, 0, 1], back: [0, 0, -1], zero: [0, 0, 0], one: [1, 1, 1],
     lerp: (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t],
@@ -905,7 +931,7 @@ function init() {
 
   const clock = new THREE.Clock();
   var _vv = new THREE.Vector3(), _qq = new THREE.Quaternion(), _ss = new THREE.Vector3();
-  renderer.setAnimationLoop(() => {
+  renderer.setAnimationLoop((time, frame) => {
     const dt = Math.min(0.05, clock.getDelta()); const el = clock.elapsedTime;
     if (renderer.xr.isPresenting) {
       var session = renderer.xr.getSession(); var refSpace = renderer.xr.getReferenceSpace();
@@ -917,8 +943,8 @@ function init() {
           var source = session.inputSources[i];
           if (source.targetRayMode !== 'tracked-pointer') continue;
           var hand = source.handedness === 'left' ? vrInput.leftHand : vrInput.rightHand;
-          if (source.gripSpace) { var pose = source.gripSpace.getPose(refSpace); if (pose) { var p = pose.transform.position, q = pose.transform.orientation; if (hand._lastPos && dt > 0) hand.velocity = [(p.x-hand._lastPos[0])/dt, (p.y-hand._lastPos[1])/dt, (p.z-hand._lastPos[2])/dt]; hand._lastPos = [p.x, p.y, p.z]; hand.position = [p.x, p.y, p.z]; hand.rotation = [q.x, q.y, q.z, q.w]; } }
-          if (source.gamepad) { var gp = source.gamepad; var ng = (gp.buttons[1] && gp.buttons[1].value || 0) > 0.1; var nt = (gp.buttons[0] && gp.buttons[0].value || 0) > 0.1; hand.gripDown = ng && !hand._prevGrip; hand.gripUp = !ng && hand._prevGrip; hand.triggerDown = nt && !hand._prevTrigger; hand.triggerUp = !nt && hand._prevTrigger; hand._prevGrip = ng; hand._prevTrigger = nt; hand.grip = ng; hand.trigger = nt; hand.thumbstick = [gp.axes[2] || 0, gp.axes[3] || 0]; hand.thumbstickDown = (gp.buttons[3] && gp.buttons[3].value || 0) > 0.1; }
+          if (source.gripSpace && frame) { var pose = frame.getPose(source.gripSpace, refSpace); if (pose) { var p = pose.transform.position, q = pose.transform.orientation; if (hand._lastPos && dt > 0) hand.velocity = [(p.x-hand._lastPos[0])/dt, (p.y-hand._lastPos[1])/dt, (p.z-hand._lastPos[2])/dt]; hand._lastPos = [p.x, p.y, p.z]; hand.position = [p.x, p.y, p.z]; hand.rotation = [q.x, q.y, q.z, q.w]; } }
+          if (source.gamepad) { var gp = source.gamepad; var buttons = gp.buttons || [], axes = gp.axes || []; var ng = (buttons[1] && buttons[1].value || 0) > 0.1; var nt = (buttons[0] && buttons[0].value || 0) > 0.1; hand.gripDown = ng && !hand._prevGrip; hand.gripUp = !ng && hand._prevGrip; hand.triggerDown = nt && !hand._prevTrigger; hand.triggerUp = !nt && hand._prevTrigger; hand._prevGrip = ng; hand._prevTrigger = nt; hand.grip = ng; hand.trigger = nt; hand.thumbstick = [axes[2] || 0, axes[3] || 0]; hand.thumbstickDown = (buttons[3] && buttons[3].value || 0) > 0.1; }
         }
       }
     } else { vrInput.present = false; }
@@ -1000,8 +1026,8 @@ function init() {
 
   addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
 }
-if (typeof THREE !== 'undefined') init();
+if (typeof THREE !== 'undefined') startScene();
 </script>
-<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update());</script>
 </body>
 </html>
