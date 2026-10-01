@@ -9,8 +9,8 @@ android {
         applicationId 'com.vrunity.vrscene'
         minSdk 24
         targetSdk 34
-        versionCode 1790814061
-        versionName '1.61'
+        versionCode 1790815873
+        versionName '1.873'
     }
     buildTypes {
         release {
