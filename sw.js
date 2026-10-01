@@ -1,5 +1,5 @@
 const PREFIX='vrunity-'+self.registration.scope;
-const C=PREFIX+"startup-fix-1790817086564";
+const C=PREFIX+"vr-1790817345963";
 const INDEX=new URL('./index.html',self.registration.scope).href;
 const FILES=['./','./index.html','./manifest.webmanifest','./icon.svg','./three.module.min.js','./three.core.min.js'];
 self.addEventListener('install',event=>{
