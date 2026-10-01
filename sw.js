@@ -1,5 +1,5 @@
 const PREFIX='vrunity-'+self.registration.scope;
-const C=PREFIX+"xr-tracking-final-1790818727035";
+const C=PREFIX+"vr-1790819259190";
 const INDEX=new URL('./index.html',self.registration.scope).href;
 const FILES=['./','./index.html','./manifest.webmanifest','./icon.svg','./three.module.min.js','./three.core.min.js'];
 self.addEventListener('install',event=>{
