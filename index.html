@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <title>VR Scene</title>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0a0c12">
-<style> html,body { margin:0; height:100%; background:#0a0c12; overflow:hidden; font-family: ui-monospace, monospace; } canvas { display:block; } </style>
 <link rel="modulepreload" href="./three.module.min.js">
 <script>
 (function () {
@@ -18,6 +17,7 @@
   });
 })();
 </script>
+<style> html,body { margin:0; height:100%; background:#0a0c12; overflow:hidden; font-family: ui-monospace, monospace; } canvas { display:block; } </style>
 </head>
 <body>
 <script>
@@ -54,10 +54,10 @@ function init() {
   console.error = function() { try { parent.postMessage({ type: 'vrunity-log', sev: 'error', msg: Array.from(arguments).map(String).join(' ') }, '*'); } catch (e) {} _origErr.apply(console, arguments); };
   window.addEventListener('error', (e) => { try { parent.postMessage({ type: 'vrunity-log', sev: 'error', msg: e.message }, '*'); } catch (x) {} });
 
-  const DATA = [{"id":"go0thl","name":"Ground","type":"plane","color":"#6b6665","position":[0,0,0],"rotation":[-1.5707963267948966,0,0],"scale":[10,10,1],"parentId":null,"collision":true,"allowPlayers":true,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go1thm","name":"Directional Light","type":"light","color":"#ffffff","position":[4,6,3],"rotation":[-1.05,0.52,0],"scale":[1,1,1],"parentId":null,"collision":true,"allowPlayers":true,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"intensity":1.3,"range":50,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go2thn","name":"VR Rig","type":"group","color":"#4C97FF","position":[0,0,0],"rotation":[0,0,0],"scale":[1,1,1],"parentId":null,"vrRole":"rig","locomotion":"walk","turning":"snap","turnInput":"right","snapAngle":45,"turnSpeed":90,"moveSpeed":1.5,"locomotionConfig":{"speed":1.5,"turnSpeed":1.5,"gravity":0,"teleportDistance":10},"sprintEnabled":true,"sprintSpeed":3.5,"sprintAcceleration":5,"sprintDeceleration":8,"sprintMode":"hold","sprintInput":"left-thumbstick","jumpEnabled":true,"teleportInput":"right-grip","teleportDistance":10,"teleportAimPosition":[0,0,0],"teleportLineColor":"#00ffff","teleportRingColor":"#00ffff","collision":true,"allowPlayers":true,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go6thn","name":"Head","type":"sphere","color":"#4fe0e0","position":[0,1.6,0],"rotation":[0,0,0],"scale":[0.14,0.16,0.14],"parentId":"go2thn","vrRole":"head","collision":true,"allowPlayers":true,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go7thn","name":"Body","type":"cylinder","color":"#5a5a5a","position":[0,1,0],"rotation":[0,0,0],"scale":[0.22,0.55,0.22],"parentId":"go2thn","vrRole":"body","collision":true,"allowPlayers":true,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go3thn","name":"Left Hand","type":"group","color":"#4fa3e8","position":[-0.35,1.2,-0.3],"rotation":[0,0,0],"scale":[1,1,1],"parentId":"go2thn","vrRole":"leftHand","collision":true,"allowPlayers":true,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}},{"id":"go4thn","name":"Right Hand","type":"group","color":"#4fa3e8","position":[0.35,1.2,-0.3],"rotation":[0,0,0],"scale":[1,1,1],"parentId":"go2thn","vrRole":"rightHand","collision":true,"allowPlayers":true,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]}}];
+  const DATA = [{"id":"go0s6v","name":"Ground","type":"plane","color":"#6b6665","position":[0,0,0],"rotation":[-1.5707963267948966,0,0],"scale":[10,10,1],"parentId":null,"collision":true,"allowPlayers":true,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]},"grabable":false,"grabRange":1.5,"grabMode":"hold","grabToHand":false,"grabOutline":true,"grabOutlineThickness":0.03,"grabOutlineColor":"#4fa3e8"},{"id":"go1s6v","name":"Directional Light","type":"light","color":"#ffffff","position":[4,6,3],"rotation":[-1.05,0.52,0],"scale":[1,1,1],"parentId":null,"collision":true,"allowPlayers":true,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"intensity":1.3,"range":50,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]},"grabable":false,"grabRange":1.5,"grabMode":"hold","grabToHand":false,"grabOutline":true,"grabOutlineThickness":0.03,"grabOutlineColor":"#4fa3e8"},{"id":"go2s6v","name":"VR Rig","type":"group","color":"#4C97FF","position":[0,0,0],"rotation":[0,0,0],"scale":[1,1,1],"parentId":null,"vrRole":"rig","locomotion":"room-scale","turning":"none","turnInput":"right","snapAngle":45,"turnSpeed":90,"moveSpeed":2,"locomotionConfig":{"speed":2,"turnSpeed":1.5,"gravity":0,"teleportDistance":10},"sprintEnabled":false,"sprintSpeed":4.5,"sprintAcceleration":5,"sprintDeceleration":8,"sprintMode":"hold","sprintInput":"left-thumbstick","teleportInput":"right-grip","teleportDistance":10,"teleportAimPosition":[0,0,0],"teleportLineColor":"#00ffff","teleportRingColor":"#00ffff","collision":true,"allowPlayers":true,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]},"grabable":false,"grabRange":1.5,"grabMode":"hold","grabToHand":false,"grabOutline":true,"grabOutlineThickness":0.03,"grabOutlineColor":"#4fa3e8","grabLeft":true,"grabRight":true,"leftGrabButton":"left-grip","rightGrabButton":"right-grip"},{"id":"go6s6v","name":"Head","type":"sphere","color":"#4fe0e0","position":[0,1.6,0],"rotation":[0,0,0],"scale":[0.14,0.16,0.14],"parentId":"go2s6v","vrRole":"head","collision":true,"allowPlayers":true,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]},"grabable":false,"grabRange":1.5,"grabMode":"hold","grabToHand":false,"grabOutline":true,"grabOutlineThickness":0.03,"grabOutlineColor":"#4fa3e8"},{"id":"go7s6v","name":"Body","type":"cylinder","color":"#5a5a5a","position":[0,1,0],"rotation":[0,0,0],"scale":[0.22,0.55,0.22],"parentId":"go2s6v","vrRole":"body","collision":true,"allowPlayers":true,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]},"grabable":false,"grabRange":1.5,"grabMode":"hold","grabToHand":false,"grabOutline":true,"grabOutlineThickness":0.03,"grabOutlineColor":"#4fa3e8"},{"id":"go3s6v","name":"Left Hand","type":"group","color":"#4fa3e8","position":[-0.35,1.2,-0.3],"rotation":[0,0,0],"scale":[1,1,1],"parentId":"go2s6v","vrRole":"leftHand","collision":true,"allowPlayers":true,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]},"grabable":false,"grabRange":1.5,"grabMode":"hold","grabToHand":false,"grabOutline":true,"grabOutlineThickness":0.03,"grabOutlineColor":"#4fa3e8"},{"id":"go4s6v","name":"Right Hand","type":"group","color":"#4fa3e8","position":[0.35,1.2,-0.3],"rotation":[0,0,0],"scale":[1,1,1],"parentId":"go2s6v","vrRole":"rightHand","collision":true,"allowPlayers":true,"audioUrl":"","audioLoop":true,"textureUrl":"","textureRepeat":1,"physics":false,"animation":{"enabled":true,"playOnStart":false,"loop":true,"duration":2,"speed":1,"keyframes":[]},"grabable":false,"grabRange":1.5,"grabMode":"hold","grabToHand":false,"grabOutline":true,"grabOutlineThickness":0.03,"grabOutlineColor":"#4fa3e8"}];
   const SCRIPTS = [];
   const SKY = {"type":"procedural","topColor":"#1a5fa0","horizonColor":"#b0d0ee","sunDir":[0.3,0.8,0.2],"sunColor":"#fff8e0","sunSize":0.02,"starDensity":0,"hazeStrength":0.25,"sunGlow":1};
-  const WORLD = {"gravity":true,"gravityStrength":9.8,"gravityPlayers":true,"gravityObjects":true,"density":1,"collision":true,"shadows":true,"ambientIntensity":0.35,"worldLight":true,"worldLightIntensity":1,"worldLightColor":"#ffffff","fog":false,"fogColor":"#9e9e9e","fogNear":10,"fogFar":60,"mpEnabled":false,"mpMaxPlayers":8,"mpPrivateCodes":false,"mpPortalObjectId":null,"mpPortalLeaveId":null,"mpPortalJoinPublicId":null,"mpPortalAssets":false,"mpMicrophone":false,"mpPushToTalk":false};
+  const WORLD = {"gravity":true,"gravityStrength":9.8,"gravityPlayers":true,"gravityObjects":true,"density":1,"collision":true,"shadows":true,"ambientIntensity":0.35,"worldLight":true,"worldLightIntensity":1,"worldLightColor":"#ffffff","fog":false,"fogColor":"#9e9e9e","fogNear":10,"fogFar":60};
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 20000);
@@ -625,7 +625,6 @@ function init() {
   };
   const World = WORLD || {};
   // ---- Game Systems (procedural, AI, pathfinding, particles, etc.) ----
-  // ---- Game Systems (procedural, AI, pathfinding, particles, etc.) ----
   
   // ---- Game Systems ----
   var Procedural = {
@@ -682,8 +681,6 @@ function init() {
   Object.defineProperty(DayNight,'sunDirection',{get:function(){var a=(DayNight.time-6)/12*Math.PI;return [Math.cos(a),Math.sin(a),0.3];}});
   Object.defineProperty(DayNight,'sunIntensity',{get:function(){var h=DayNight.time;if(h<5||h>19)return 0;if(h<7)return (h-5)/2;if(h>17)return (19-h)/2;return 1;}});
 
-
-  
 
   // ---- Physics ----
   var _raycaster = new THREE.Raycaster();
@@ -797,6 +794,7 @@ function init() {
   GameObject.FindWithTag = function(tag) { var o = DATA.find(function(x) { return (x.tag || 'Untagged') === tag; }); if (!o || !meshes[o.id]) return null; return makeTransform(meshes[o.id]); };
   const entries = [];
   const rbVelocities = {};
+  const rbSpin = {};
   SCRIPTS.forEach((s) => {
     const mesh = meshes[s.id]; if (!mesh) return;
     const transform = makeTransform(mesh);
@@ -848,8 +846,8 @@ function init() {
     var Rigidbody = {
       get velocity() { return rbVelocities[s.id] || [0, 0, 0]; },
       set velocity(v) { rbVelocities[s.id] = [v[0]||0, v[1]||0, v[2]||0]; },
-      get angularVelocity() { return rbVelocities[s.id + '_ang'] || [0, 0, 0]; },
-      set angularVelocity(v) { rbVelocities[s.id + '_ang'] = [v[0]||0, v[1]||0, v[2]||0]; },
+      get angularVelocity() { return rbSpin[s.id] || [0, 0, 0]; },
+      set angularVelocity(v) { rbSpin[s.id] = [v[0]||0, v[1]||0, v[2]||0]; },
       get mass() { return (oData && oData._mass) || 1; }, set mass(v) { if (oData) oData._mass = v; },
       get drag() { if (!oData || oData._drag == null) return 0.01; return oData._drag; }, set drag(v) { if (oData) oData._drag = v; },
       get useGravity() { if (!oData) return true; return oData._useGravity !== false; }, set useGravity(v) { if (oData) oData._useGravity = v; },
@@ -858,7 +856,7 @@ function init() {
       get rotation() { return transform.rotation; }, set rotation(v) { transform.rotation = v; },
       AddForce: function(force, mode) { var v = rbVelocities[s.id] || [0,0,0]; rbVelocities[s.id] = [v[0]+force[0], v[1]+force[1], v[2]+force[2]]; },
       AddRelativeForce: function(force, mode) { var lf = transform.TransformDirection(force); Rigidbody.AddForce(lf, mode); },
-      AddTorque: function(torque, mode) { var v = rbVelocities[s.id+'_ang'] || [0,0,0]; rbVelocities[s.id+'_ang'] = [v[0]+torque[0], v[1]+torque[1], v[2]+torque[2]]; },
+      AddTorque: function(torque, mode) { var v = rbSpin[s.id] || [0,0,0]; rbSpin[s.id] = [v[0]+torque[0], v[1]+torque[1], v[2]+torque[2]]; },
       AddRelativeTorque: function(torque, mode) { Rigidbody.AddTorque(torque, mode); },
       AddForceAtPosition: function(force, pos, mode) { Rigidbody.AddForce(force, mode); },
       AddExplosionForce: function(force, pos, radius, uplift, mode) { var p = transform.position; var dir = [p[0]-pos[0], p[1]-pos[1], p[2]-pos[2]]; var dist = Math.hypot(dir[0],dir[1],dir[2]) || 1; if (dist > radius) return; var f = force * (1 - dist/radius); Rigidbody.AddForce([dir[0]/dist*f, dir[1]/dist*f + (uplift||0)*f, dir[2]/dist*f], mode); },
@@ -896,286 +894,21 @@ function init() {
   scene.add(ctrl0); scene.add(ctrl1);
   const rig = {};
   DATA.forEach((o) => { if (o.vrRole && meshes[o.id]) rig[o.vrRole] = meshes[o.id]; });
-  const xrRuntime = (function createRuntime({ THREE, renderer, scene, camera, rig, rigObj, meshes, DATA, WORLD, vrInput, makeInput, makeMovement }) {
-  const tracking = makeInput({ THREE, renderer, input: vrInput });
-  const movement = makeMovement({ THREE, renderer, scene, rigObj, rig, meshes, data: DATA, world: WORLD, input: vrInput });
-  const yaw = new THREE.Euler(0, 0, 0, 'YXZ');
-  return {
-    start(base, floor) { tracking.reset(); movement.start(base, floor); },
-    stop() { tracking.reset(); movement.reset(); },
-    update(dt, frame) { tracking.update(dt, frame); movement.update(dt, frame); },
-    sync() {
-      tracking.apply(rig.head, vrInput.head);
-      tracking.apply(rig.leftHand, vrInput.leftHand);
-      tracking.apply(rig.rightHand, vrInput.rightHand);
-      if (rig.leftHand) rig.leftHand.visible = vrInput.leftHand.tracked;
-      if (rig.rightHand) rig.rightHand.visible = vrInput.rightHand.tracked;
-      if (rig.body && vrInput.head.tracked) {
-        rig.body.position.fromArray(vrInput.head.position); rig.body.position.y -= 0.5;
-        yaw.setFromQuaternion(new THREE.Quaternion().fromArray(vrInput.head.rotation), 'YXZ');
-        rig.body.rotation.set(0, yaw.y, 0);
-      }
-      // Keep the first-person head out of the eye cameras while retaining it for scripts.
-      if (rig.head) rig.head.visible = !renderer.xr.isPresenting;
-    },
-  };
-})({ THREE, renderer, scene, camera, rig, rigObj, meshes, DATA, WORLD, vrInput, makeInput: (function createXrInput({ THREE, renderer, input }) {
-  const hands = [input.leftHand, input.rightHand];
-  const v = new THREE.Vector3(), q = new THREE.Quaternion(), oldQ = new THREE.Quaternion();
-  const pressed = button => Boolean(button?.pressed || (button?.value || 0) > 0.1);
-  let gestures = new WeakMap();
-  let observedSession = null;
-  const gesture = event => {
-    if (!event.inputSource) return;
-    const state = gestures.get(event.inputSource) || {};
-    state[event.type.startsWith('select') ? 'trigger' : 'grip'] = event.type.endsWith('start');
-    gestures.set(event.inputSource, state);
-  };
-  const observe = session => {
-    if (session === observedSession) return;
-    for (const type of ['selectstart', 'selectend', 'squeezestart', 'squeezeend']) {
-      observedSession?.removeEventListener(type, gesture);
-      session?.addEventListener(type, gesture);
-    }
-    observedSession = session;
-  };
-  const buttons = (hand, source) => {
-    const b = source?.gamepad?.buttons || [], axes = source?.gamepad?.axes || [];
-    const state = source ? gestures.get(source) || {} : {};
-    const grip = b[1] ? pressed(b[1]) : !!state.grip, trigger = b[0] ? pressed(b[0]) : !!state.trigger;
-    hand.gripDown = grip && !hand.grip; hand.gripUp = !grip && !!hand.grip;
-    hand.triggerDown = trigger && !hand.trigger; hand.triggerUp = !trigger && !!hand.trigger;
-    hand.grip = grip; hand.trigger = trigger;
-    hand.thumbstick = axes.length >= 4 ? [axes[2] || 0, axes[3] || 0] : [axes[0] || 0, axes[1] || 0];
-    hand.thumbstickDown = pressed(b[3]);
-    // Face buttons — xr-standard puts them at index 4 (upper) and 5 (lower).
-    // The right controller reports A and B there, the left controller reports
-    // X and Y, so the same indices must be named by handedness — mapping only
-    // A/B left the left controller's X/Y buttons dead.
-    const upper = pressed(b[4]), lower = pressed(b[5]);
-    const isLeft = source?.handedness === 'left';
-    hand.aButton = !isLeft && upper; hand.bButton = !isLeft && lower;
-    hand.xButton = isLeft && upper; hand.yButton = isLeft && lower;
-    hand.faceUpper = upper; hand.faceLower = lower;
-  };
-  const poseInto = (target, pose, dt, sampleVelocity) => {
-    target.tracked = !!pose;
-    if (!pose) { target._lastPos = null; target._lastRotation = null; target.velocity = [0, 0, 0]; target.angularVelocity = [0, 0, 0]; return; }
-    const p = pose.transform.position, r = pose.transform.orientation;
-    if (sampleVelocity) {
-      target.velocity = target._lastPos && dt > 0 ? [(p.x - target._lastPos[0]) / dt, (p.y - target._lastPos[1]) / dt, (p.z - target._lastPos[2]) / dt] : [0, 0, 0];
-      target.angularVelocity = [0, 0, 0];
-      if (target._lastRotation && dt > 0) {
-        q.set(r.x, r.y, r.z, r.w).multiply(oldQ.fromArray(target._lastRotation).invert()).normalize();
-        if (q.w < 0) q.set(-q.x, -q.y, -q.z, -q.w);
-        const angle = 2 * Math.acos(Math.min(1, Math.max(-1, q.w))), length = Math.hypot(q.x, q.y, q.z);
-        if (length > 0.00001) target.angularVelocity = [q.x, q.y, q.z].map(x => x * angle / (length * dt));
-      }
-      target._lastPos = [p.x, p.y, p.z]; target._lastRotation = [r.x, r.y, r.z, r.w];
-    }
-    target.position = [p.x, p.y, p.z]; target.rotation = [r.x, r.y, r.z, r.w];
-  };
-  const reset = () => {
-    input.present = false; input.head.tracked = false;
-    if (observedSession) { observe(null); gestures = new WeakMap(); }
-    hands.forEach(hand => { buttons(hand, null); hand.connected = false; hand.tracked = false; hand.rayTracked = false; hand._lastPos = null; hand._lastRotation = null; hand.velocity = [0, 0, 0]; hand.angularVelocity = [0, 0, 0]; });
-  };
-  const sample = (dt, frame, sampleButtons) => {
-    const session = renderer.xr.getSession(), space = renderer.xr.getReferenceSpace();
-    if (!renderer.xr.isPresenting || !session || !space || !frame || session.visibilityState === 'hidden') { reset(); return; }
-    observe(session);
-    const viewer = frame.getViewerPose(space);
-    poseInto(input.head, viewer, dt, false); input.present = !!viewer;
-    const sources = {};
-    for (const source of session.inputSources || []) if (source.handedness === 'left' || source.handedness === 'right') sources[source.handedness] = source;
-    hands.forEach((hand, index) => {
-      const source = sources[index === 0 ? 'left' : 'right'];
-      hand.connected = !!source;
-      let pose = null;
-      if (source?.hand && frame.getJointPose) {
-        const wrist = source.hand.get('wrist');
-        if (wrist) pose = frame.getJointPose(wrist, space);
-      } else if (source?.gripSpace || source?.targetRaySpace) pose = frame.getPose(source.gripSpace || source.targetRaySpace, space);
-      poseInto(hand, viewer ? pose : null, dt, sampleButtons);
-      const ray = source?.targetRaySpace && frame.getPose(source.targetRaySpace, space);
-      hand.rayTracked = !!ray;
-      if (ray) {
-        const p = ray.transform.position, r = ray.transform.orientation;
-        hand.rayPosition = [p.x, p.y, p.z]; hand.rayRotation = [r.x, r.y, r.z, r.w];
-      }
-      if (sampleButtons) buttons(hand, viewer && hand.tracked ? source : null);
-    });
-  };
-  const apply = (target, pose) => {
-    if (!target || !pose.tracked) return;
-    v.fromArray(pose.position); q.fromArray(pose.rotation);
-    if (target.parent) { target.parent.updateWorldMatrix(true, false); target.parent.worldToLocal(v); q.premultiply(oldQ.copy(target.parent.getWorldQuaternion(oldQ)).invert()); }
-    target.position.copy(v); target.quaternion.copy(q);
-  };
-  return { update: (dt, frame) => sample(dt, frame, true), refresh: frame => sample(0, frame, false), reset, apply };
-}), makeMovement: (function createWebSceneMovement({ THREE, renderer, scene, rigObj, rig, meshes, data, world, input }) {
-  let base = null, floorRelative = true, armed = true, speed = 0, velY = 0, prevJump = false, prevSprint = false, sprintToggle = false, wasAiming = false, destination = null, previousYaw = 0;
-  const direction = new THREE.Vector3(), origin = new THREE.Vector3(), next = new THREE.Vector3(), normal = new THREE.Vector3(), quaternion = new THREE.Quaternion(), inverse = new THREE.Quaternion(), ray = new THREE.Raycaster();
-  let moveX = 0, moveZ = 0, line = null, ring = null;
-  const excluded = new Set(data.filter(o => o.vrRole || ['light', 'audio', 'camera', 'trigger', 'delay', 'foundation'].includes(o.type)).map(o => o.id));
-  let changed = true;
-  while (changed) { changed = false; data.forEach(o => { if (excluded.has(o.parentId) && !excluded.has(o.id)) { excluded.add(o.id); changed = true; } }); }
-  const targets = data.filter(o => !excluded.has(o.id) && o.collision !== false && o.allowPlayers !== false).map(o => meshes[o.id]).filter(Boolean);
-  const binding = key => {
-    if (key === 'a' || key === 'b') return { hand: input.rightHand, button: key === 'a' ? 'aButton' : 'bButton' };
-    if (key === 'x' || key === 'y') return { hand: input.leftHand, button: key === 'x' ? 'xButton' : 'yButton' };
-    const [side, button] = (key || 'right-grip').split('-');
-    return { hand: side === 'left' ? input.leftHand : input.rightHand, button: button === 'thumbstick' ? 'thumbstickDown' : button };
-  };
-  const down = key => { const b = binding(key); return b.hand.tracked && !!b.hand[b.button]; };
-  const hits = (point, dir, distance) => { ray.set(point, dir); ray.far = distance; return ray.intersectObjects(targets, true); };
-  const reset = () => { base = null; speed = velY = 0; armed = true; prevJump = prevSprint = sprintToggle = wasAiming = false; destination = null; if (line) line.visible = false; if (ring) ring.visible = false; };
-  const update = (dt, frame) => {
-    if (!base || !rigObj || !input.present || !frame) return;
-    const p = rigObj.position, r = rigObj.rotation;
-    const rawViewer = frame.getViewerPose(base);
-    if (!rawViewer) return;
-    scene.updateMatrixWorld(true);
-    const raw = rawViewer.transform.position;
-    const turnHand = rigObj.turnInput === 'left' ? input.leftHand : input.rightHand;
-    const turnX = turnHand.tracked ? turnHand.thumbstick[0] : 0;
-    if (Math.abs(turnX) < 0.3) armed = true;
-    if (rigObj.turning === 'snap' && armed && Math.abs(turnX) > 0.7) { r[1] -= Math.sign(turnX) * (rigObj.snapAngle || 45) * Math.PI / 180; armed = false; }
-    if (rigObj.turning === 'smooth' && Math.abs(turnX) > 0.1) r[1] -= turnX * (rigObj.turnSpeed ?? 90) * Math.PI / 180 * dt;
-    if (r[1] !== previousYaw) {
-      // Turn around the real headset, not around the original room origin.
-      const beforeX = Math.cos(previousYaw) * raw.x + Math.sin(previousYaw) * raw.z;
-      const beforeZ = -Math.sin(previousYaw) * raw.x + Math.cos(previousYaw) * raw.z;
-      p[0] += beforeX - (Math.cos(r[1]) * raw.x + Math.sin(r[1]) * raw.z);
-      p[2] += beforeZ - (-Math.sin(r[1]) * raw.x + Math.cos(r[1]) * raw.z);
-      previousYaw = r[1];
-    }
-    if (rigObj.locomotion === 'walk') {
-      const hand = rigObj.turnInput === 'left' ? input.rightHand : input.leftHand;
-      if (!hand.tracked) speed = 0;
-      const x = hand.tracked ? hand.thumbstick[0] : 0, y = hand.tracked ? hand.thumbstick[1] : 0;
-      const magnitude = Math.min(1, Math.hypot(x, y));
-      const sprintButton = down(rigObj.sprintInput || 'left-thumbstick');
-      if (sprintButton && !prevSprint) sprintToggle = !sprintToggle;
-      prevSprint = sprintButton;
-      const sprint = rigObj.sprintEnabled && (rigObj.sprintMode === 'toggle' ? sprintToggle : sprintButton);
-      const targetSpeed = magnitude > 0.1 ? (sprint ? rigObj.sprintSpeed ?? 3.5 : rigObj.moveSpeed ?? 1.5) * magnitude : 0;
-      const rate = targetSpeed > speed ? (sprint ? rigObj.sprintAcceleration ?? 5 : (rigObj.moveSpeed ?? 1.5) * 3) : rigObj.sprintDeceleration ?? 8;
-      speed += Math.max(-rate * dt, Math.min(rate * dt, targetSpeed - speed));
-      if (magnitude > 0.1) {
-        direction.set(x, 0, y).applyQuaternion(quaternion.fromArray(input.head.rotation)); direction.y = 0; direction.normalize();
-        moveX = direction.x; moveZ = direction.z;
-      }
-      const dx = moveX * speed * dt, dz = moveZ * speed * dt;
-      for (const [axis, amount] of [[0, dx], [2, dz]]) {
-        if (!amount) continue;
-        let permitted = true;
-        if (world.collision !== false) {
-          direction.set(axis === 0 ? Math.sign(amount) : 0, 0, axis === 2 ? Math.sign(amount) : 0);
-          for (const height of [0.25, 0.8, Math.max(0.3, (rigObj.playerHeight || 1.6) - 0.15)]) {
-            for (const width of [-0.2, 0, 0.2]) {
-              origin.set(input.head.position[0], p[1] + height, input.head.position[2]);
-              if (axis === 0) origin.z += width; else origin.x += width;
-              if (hits(origin, direction, Math.abs(amount) + 0.3).length) permitted = false;
-            }
-          }
-        }
-        if (permitted) p[axis] += amount;
-      }
-    }
-    const gravity = world.gravity !== false && world.gravityPlayers !== false ? world.gravityStrength ?? 9.8 : 0;
-    if (gravity > 0) {
-      origin.set(input.head.position[0], p[1] + 0.2, input.head.position[2]); direction.set(0, -1, 0);
-      const floor = world.collision !== false ? hits(origin, direction, Infinity).find(hit => hit.face && normal.copy(hit.face.normal).transformDirection(hit.object.matrixWorld).y > 0.5) : null;
-      const floorY = floor ? floor.point.y : -Infinity, grounded = p[1] <= floorY + 0.05;
-      const jump = rigObj.jumpEnabled && down(rigObj.jumpInput || 'a');
-      if (jump && !prevJump && grounded) velY = Math.sqrt(2 * gravity * (rigObj.jumpHeight ?? 1.5));
-      prevJump = jump;
-      if (!grounded || velY > 0) {
-        velY -= gravity * dt;
-        let delta = velY * dt;
-        if (delta > 0 && world.collision !== false) {
-          origin.fromArray(input.head.position); direction.set(0, 1, 0);
-          const roof = hits(origin, direction, delta + 0.12)[0];
-          if (roof) { delta = Math.max(0, roof.distance - 0.12); velY = 0; }
-        }
-        p[1] += delta;
-      }
-      if (p[1] < floorY || (grounded && velY <= 0)) { p[1] = floorY; velY = 0; }
-    }
-    if (rigObj.locomotion === 'teleport') {
-      const selected = binding(rigObj.teleportInput || 'right-grip'), hand = selected.hand;
-      const aiming = hand.tracked && hand.rayTracked && !!hand[selected.button];
-      if (aiming) {
-        if (!line) {
-          const geometry = new THREE.BufferGeometry();
-          geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(25 * 3), 3));
-          line = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: rigObj.teleportLineColor || '#00ffff' }));
-          line.frustumCulled = false;
-          ring = new THREE.Mesh(new THREE.RingGeometry(0.18, 0.23, 24), new THREE.MeshBasicMaterial({ color: rigObj.teleportRingColor || '#00ffff', side: THREE.DoubleSide }));
-          ring.rotation.x = -Math.PI / 2; scene.add(line, ring);
-        }
-        quaternion.fromArray(hand.rayRotation);
-        origin.fromArray(hand.rayPosition).add(next.fromArray(rigObj.teleportAimPosition || [0, 0, 0]).applyQuaternion(quaternion));
-        const launch = new THREE.Vector3(0, 0, -1).applyQuaternion(quaternion).multiplyScalar(Math.sqrt(Math.max(0.1, rigObj.teleportDistance ?? 10) * 9.8));
-        const points = [origin.clone()]; destination = null;
-        for (let i = 1; i <= 24; i++) {
-          const t = i * 0.1; next.copy(origin).addScaledVector(launch, t); next.y -= 4.9 * t * t;
-          const previous = points[points.length - 1]; direction.copy(next).sub(previous);
-          const distance = direction.length(); direction.normalize();
-          const hit = hits(previous, direction, distance)[0];
-          if (hit) {
-            points.push(hit.point.clone());
-            if (hit.face && normal.copy(hit.face.normal).transformDirection(hit.object.matrixWorld).y > 0.5 && hit.point.distanceTo(origin) <= (rigObj.teleportDistance ?? 10)) destination = hit.point.clone();
-            break;
-          }
-          points.push(next.clone());
-        }
-        points.forEach((point, index) => line.geometry.attributes.position.setXYZ(index, point.x, point.y, point.z));
-        line.geometry.attributes.position.needsUpdate = true; line.geometry.setDrawRange(0, points.length);
-        line.visible = true; ring.visible = !!destination;
-        if (destination) ring.position.copy(destination).add(new THREE.Vector3(0, 0.015, 0));
-      } else {
-        if (wasAiming && destination && hand.connected && hand.tracked && hand.rayTracked) {
-          p[0] = destination.x - (Math.cos(r[1]) * raw.x + Math.sin(r[1]) * raw.z);
-          p[1] = destination.y; p[2] = destination.z - (-Math.sin(r[1]) * raw.x + Math.cos(r[1]) * raw.z); velY = 0;
-        }
-        destination = null; if (line) line.visible = false; if (ring) ring.visible = false;
-      }
-      wasAiming = aiming;
-    }
-    quaternion.setFromEuler(new THREE.Euler(0, r[1] || 0, 0)); inverse.copy(quaternion).invert();
-    origin.fromArray(p).applyQuaternion(inverse).negate();
-    const height = rigObj.playerHeight ?? 1.6;
-    if (height > 0) origin.y += raw.y - height;
-    else if (!floorRelative) origin.y -= 1.6;
-    renderer.xr.setReferenceSpace(base.getOffsetReferenceSpace(new XRRigidTransform(
-      { x: origin.x, y: origin.y, z: origin.z }, { x: inverse.x, y: inverse.y, z: inverse.z, w: inverse.w }
-    )));
-    if (rig.rig) { rig.rig.position.fromArray(p); rig.rig.rotation.set(0, r[1] || 0, 0); }
-  };
-  return { start(space, floor = true) { reset(); base = space; floorRelative = floor; previousYaw = rigObj?.rotation?.[1] || 0; }, reset, update };
-}) });
+  const xrRuntime = (function TN({THREE:e,renderer:t,scene:n,camera:r,rig:i,rigObj:a,meshes:o,DATA:s,WORLD:c,vrInput:l,makeInput:u,makeMovement:d}){let f=u({THREE:e,renderer:t,input:l}),p=d({THREE:e,renderer:t,scene:n,rigObj:a,rig:i,meshes:o,data:s,world:c,input:l}),m=new e.Euler(0,0,0,`YXZ`);return{start(e,t){f.reset(),p.start(e,t)},stop(){f.reset(),p.reset()},update(e,t){f.update(e,t),p.update(e,t)},sync(){f.apply(i.head,l.head),f.apply(i.leftHand,l.leftHand),f.apply(i.rightHand,l.rightHand),i.leftHand&&(i.leftHand.visible=l.leftHand.tracked),i.rightHand&&(i.rightHand.visible=l.rightHand.tracked),i.body&&l.head.tracked&&(i.body.position.fromArray(l.head.position),i.body.position.y-=.5,m.setFromQuaternion(new e.Quaternion().fromArray(l.head.rotation),`YXZ`),i.body.rotation.set(0,m.y,0)),i.head&&(i.head.visible=!t.xr.isPresenting)}}})({ THREE, renderer, scene, camera, rig, rigObj, meshes, DATA, WORLD, vrInput, makeInput: (function CN({THREE:e,renderer:t,input:n}){let r=[n.leftHand,n.rightHand],i=new e.Vector3,a=new e.Quaternion,o=new e.Quaternion,s=e=>!!(e?.pressed||(e?.value||0)>.1),c=new WeakMap,l=null,u=e=>{if(!e.inputSource)return;let t=c.get(e.inputSource)||{};t[e.type.startsWith(`select`)?`trigger`:`grip`]=e.type.endsWith(`start`),c.set(e.inputSource,t)},d=e=>{if(e!==l){for(let t of[`selectstart`,`selectend`,`squeezestart`,`squeezeend`])l?.removeEventListener(t,u),e?.addEventListener(t,u);l=e}},f=(e,t)=>{let n=t?.gamepad?.buttons||[],r=t?.gamepad?.axes||[],i=t&&c.get(t)||{},a=n[1]?s(n[1]):!!i.grip,o=n[0]?s(n[0]):!!i.trigger;e.gripDown=a&&!e.grip,e.gripUp=!a&&!!e.grip,e.triggerDown=o&&!e.trigger,e.triggerUp=!o&&!!e.trigger,e.grip=a,e.trigger=o,e.thumbstick=r.length>=4?[r[2]||0,r[3]||0]:[r[0]||0,r[1]||0],e.thumbstickDown=s(n[3]);let l=s(n[4]),u=s(n[5]),d=t?.handedness===`left`;e.aButton=!d&&l,e.bButton=!d&&u,e.xButton=d&&l,e.yButton=d&&u,e.faceUpper=l,e.faceLower=u},p=(e,t,n,r)=>{if(e.tracked=!!t,!t){e._lastPos=null,e._lastRotation=null,e.velocity=[0,0,0],e.angularVelocity=[0,0,0];return}let i=t.transform.position,s=t.transform.orientation;if(r){if(e.velocity=e._lastPos&&n>0?[(i.x-e._lastPos[0])/n,(i.y-e._lastPos[1])/n,(i.z-e._lastPos[2])/n]:[0,0,0],e.angularVelocity=[0,0,0],e._lastRotation&&n>0){a.set(s.x,s.y,s.z,s.w).multiply(o.fromArray(e._lastRotation).invert()).normalize(),a.w<0&&a.set(-a.x,-a.y,-a.z,-a.w);let t=2*Math.acos(Math.min(1,Math.max(-1,a.w))),r=Math.hypot(a.x,a.y,a.z);r>1e-5&&(e.angularVelocity=[a.x,a.y,a.z].map(e=>e*t/(r*n)))}e._lastPos=[i.x,i.y,i.z],e._lastRotation=[s.x,s.y,s.z,s.w]}e.position=[i.x,i.y,i.z],e.rotation=[s.x,s.y,s.z,s.w]},m=()=>{n.present=!1,n.head.tracked=!1,l&&(d(null),c=new WeakMap),r.forEach(e=>{f(e,null),e.connected=!1,e.tracked=!1,e.rayTracked=!1,e._lastPos=null,e._lastRotation=null,e.velocity=[0,0,0],e.angularVelocity=[0,0,0]})},h=(e,i,a)=>{let o=t.xr.getSession(),s=t.xr.getReferenceSpace();if(!t.xr.isPresenting||!o||!s||!i||o.visibilityState===`hidden`){m();return}d(o);let c=i.getViewerPose(s);p(n.head,c,e,!1),n.present=!!c;let l={};for(let e of o.inputSources||[])(e.handedness===`left`||e.handedness===`right`)&&(l[e.handedness]=e);r.forEach((t,n)=>{let r=l[n===0?`left`:`right`];t.connected=!!r;let o=null;if(r?.hand&&i.getJointPose){let e=r.hand.get(`wrist`);e&&(o=i.getJointPose(e,s))}else(r?.gripSpace||r?.targetRaySpace)&&(o=i.getPose(r.gripSpace||r.targetRaySpace,s));p(t,c?o:null,e,a);let u=r?.targetRaySpace&&i.getPose(r.targetRaySpace,s);if(t.rayTracked=!!u,u){let e=u.transform.position,n=u.transform.orientation;t.rayPosition=[e.x,e.y,e.z],t.rayRotation=[n.x,n.y,n.z,n.w]}a&&f(t,c&&t.tracked?r:null)})};return{update:(e,t)=>h(e,t,!0),refresh:e=>h(0,e,!1),reset:m,apply:(e,t)=>{!e||!t.tracked||(i.fromArray(t.position),a.fromArray(t.rotation),e.parent&&(e.parent.updateWorldMatrix(!0,!1),e.parent.worldToLocal(i),a.premultiply(o.copy(e.parent.getWorldQuaternion(o)).invert())),e.position.copy(i),e.quaternion.copy(a))}}}), makeMovement: (function wN({THREE:e,renderer:t,scene:n,rigObj:r,rig:i,meshes:a,data:o,world:s,input:c}){let l=null,u=!0,d=!0,f=0,p=0,m=!1,h=!1,g=!1,_=!1,v=null,y=0,b=new e.Vector3,x=new e.Vector3,S=new e.Vector3,C=new e.Vector3,w=new e.Quaternion,T=new e.Quaternion,E=new e.Raycaster,D=0,O=0,k=null,A=null,j=new Set(o.filter(e=>e.vrRole||[`light`,`audio`,`camera`,`trigger`,`delay`,`foundation`].includes(e.type)).map(e=>e.id)),M=!0;for(;M;)M=!1,o.forEach(e=>{j.has(e.parentId)&&!j.has(e.id)&&(j.add(e.id),M=!0)});let N=o.filter(e=>!j.has(e.id)&&e.collision!==!1&&e.allowPlayers!==!1).map(e=>a[e.id]).filter(Boolean),P=e=>{if(e===`a`||e===`b`)return{hand:c.rightHand,button:e===`a`?`aButton`:`bButton`};if(e===`x`||e===`y`)return{hand:c.leftHand,button:e===`x`?`xButton`:`yButton`};let[t,n]=(e||`right-grip`).split(`-`);return{hand:t===`left`?c.leftHand:c.rightHand,button:n===`thumbstick`?`thumbstickDown`:n}},F=e=>{let t=P(e);return t.hand.tracked&&!!t.hand[t.button]},I=(e,t,n)=>(E.set(e,t),E.far=n,E.intersectObjects(N,!0)),L=()=>{l=null,f=p=0,d=!0,m=h=g=_=!1,v=null,k&&(k.visible=!1),A&&(A.visible=!1)};return{start(e,t=!0){L(),l=e,u=t,y=r?.rotation?.[1]||0},reset:L,update:(a,o)=>{if(!l||!r||!c.present||!o)return;let E=r.position,j=r.rotation,M=o.getViewerPose(l);if(!M)return;n.updateMatrixWorld(!0);let N=M.transform.position,L=r.turnInput===`left`?c.leftHand:c.rightHand,R=L.tracked?L.thumbstick[0]:0;if(Math.abs(R)<.3&&(d=!0),r.turning===`snap`&&d&&Math.abs(R)>.7&&(j[1]-=Math.sign(R)*(r.snapAngle||45)*Math.PI/180,d=!1),r.turning===`smooth`&&Math.abs(R)>.1&&(j[1]-=R*(r.turnSpeed??90)*Math.PI/180*a),j[1]!==y){let e=Math.cos(y)*N.x+Math.sin(y)*N.z,t=-Math.sin(y)*N.x+Math.cos(y)*N.z;E[0]+=e-(Math.cos(j[1])*N.x+Math.sin(j[1])*N.z),E[2]+=t-(-Math.sin(j[1])*N.x+Math.cos(j[1])*N.z),y=j[1]}if(r.locomotion===`walk`){let e=r.turnInput===`left`?c.rightHand:c.leftHand;e.tracked||(f=0);let t=e.tracked?e.thumbstick[0]:0,n=e.tracked?e.thumbstick[1]:0,i=Math.min(1,Math.hypot(t,n)),o=i**1.4,l=F(r.sprintInput||`left-thumbstick`);l&&!h&&(g=!g),h=l;let u=r.sprintEnabled&&(r.sprintMode===`toggle`?g:l),d=i>.1?(u?r.sprintSpeed??4.5:r.moveSpeed??2)*o:0,p=d>f?u?r.sprintAcceleration??5:(r.moveSpeed??2)*3:r.sprintDeceleration??8;if(f+=Math.max(-p*a,Math.min(p*a,d-f)),Math.abs(f)<.02&&(f=0,i<=.1&&(D=0,O=0)),i>.1){b.set(t,0,n).applyQuaternion(w.fromArray(c.head.rotation)),b.y=0,b.normalize();let e=Math.min(1,a*12);if(!D&&!O)D=b.x,O=b.z;else{D+=(b.x-D)*e,O+=(b.z-O)*e;let t=Math.hypot(D,O)||1;D/=t,O/=t}}let m=D*f*a,_=O*f*a;for(let[e,t]of[[0,m],[2,_]]){if(!t)continue;let n=!0;if(s.collision!==!1){b.set(e===0?Math.sign(t):0,0,e===2?Math.sign(t):0);for(let i of[.25,.8,Math.max(.3,(r.playerHeight||1.6)-.15)])for(let r of[-.2,0,.2])x.set(c.head.position[0],E[1]+i,c.head.position[2]),e===0?x.z+=r:x.x+=r,I(x,b,Math.abs(t)+.3).length&&(n=!1)}n&&(E[e]+=t)}}let ee=s.gravity!==!1&&s.gravityPlayers!==!1?s.gravityStrength??9.8:0;if(ee>0){x.set(c.head.position[0],E[1]+.2,c.head.position[2]),b.set(0,-1,0);let e=s.collision===!1?null:I(x,b,1/0).find(e=>e.face&&C.copy(e.face.normal).transformDirection(e.object.matrixWorld).y>.5),t=e?e.point.y:-1/0,n=E[1]<=t+.05,i=r.jumpEnabled&&F(r.jumpInput||`a`);if(i&&!m&&n&&(p=Math.sqrt(2*ee*(r.jumpHeight??1.5))),m=i,!n||p>0){p-=ee*a;let e=p*a;if(e>0&&s.collision!==!1){x.fromArray(c.head.position),b.set(0,1,0);let t=I(x,b,e+.12)[0];t&&(e=Math.max(0,t.distance-.12),p=0)}E[1]+=e}(E[1]<t||n&&p<=0)&&(E[1]=t,p=0)}if(r.locomotion===`teleport`){let t=P(r.teleportInput||`right-grip`),i=t.hand,a=i.tracked&&i.rayTracked&&!!i[t.button];if(a){if(!k){let t=new e.BufferGeometry;t.setAttribute(`position`,new e.BufferAttribute(new Float32Array(75),3)),k=new e.Line(t,new e.LineBasicMaterial({color:r.teleportLineColor||`#00ffff`})),k.frustumCulled=!1,A=new e.Mesh(new e.RingGeometry(.18,.23,24),new e.MeshBasicMaterial({color:r.teleportRingColor||`#00ffff`,side:e.DoubleSide})),A.rotation.x=-Math.PI/2,n.add(k,A)}w.fromArray(i.rayRotation),x.fromArray(i.rayPosition).add(S.fromArray(r.teleportAimPosition||[0,0,0]).applyQuaternion(w));let t=new e.Vector3(0,0,-1).applyQuaternion(w).multiplyScalar(Math.sqrt(Math.max(.1,r.teleportDistance??10)*9.8)),a=[x.clone()];v=null;for(let e=1;e<=24;e++){let n=e*.1;S.copy(x).addScaledVector(t,n),S.y-=4.9*n*n;let i=a[a.length-1];b.copy(S).sub(i);let o=b.length();b.normalize();let s=I(i,b,o)[0];if(s){a.push(s.point.clone()),s.face&&C.copy(s.face.normal).transformDirection(s.object.matrixWorld).y>.5&&s.point.distanceTo(x)<=(r.teleportDistance??10)&&(v=s.point.clone());break}a.push(S.clone())}a.forEach((e,t)=>k.geometry.attributes.position.setXYZ(t,e.x,e.y,e.z)),k.geometry.attributes.position.needsUpdate=!0,k.geometry.setDrawRange(0,a.length),k.visible=!0,A.visible=!!v,v&&A.position.copy(v).add(new e.Vector3(0,.015,0))}else _&&v&&i.connected&&i.tracked&&i.rayTracked&&(E[0]=v.x-(Math.cos(j[1])*N.x+Math.sin(j[1])*N.z),E[1]=v.y,E[2]=v.z-(-Math.sin(j[1])*N.x+Math.cos(j[1])*N.z),p=0),v=null,k&&(k.visible=!1),A&&(A.visible=!1);_=a}w.setFromEuler(new e.Euler(0,j[1]||0,0)),T.copy(w).invert(),x.fromArray(E).applyQuaternion(T).negate();let te=r.playerHeight??1.6;te>0?x.y+=N.y-te:u||(x.y-=1.6),t.xr.setReferenceSpace(l.getOffsetReferenceSpace(new XRRigidTransform({x:x.x,y:x.y,z:x.z},{x:T.x,y:T.y,z:T.z,w:T.w}))),i.rig&&(i.rig.position.fromArray(E),i.rig.rotation.set(0,j[1]||0,0))}}}) });
 
-  // ---- Physics ----
-  const SOLID = ['cube', 'sphere', 'cylinder', 'model'];
-  const velocities = {};
-  function stepPhysics(dt) {
-    if (!World || World.gravity === false || World.gravityObjects === false) return;
-    // Gravity is exactly the strength in m/s² (the hidden density multiplier is gone).
-    const g = World.gravityStrength ?? 9.8;
-    DATA.forEach((o) => {
-      if (!SOLID.includes(o.type) || o.vrRole || !o.physics) return;
-      const m = meshes[o.id]; if (!m) return;
-      const v = velocities[o.id] || (velocities[o.id] = [0, 0, 0]);
-      v[1] -= g * dt;
-      m.position.x += v[0] * dt; m.position.y += v[1] * dt; m.position.z += v[2] * dt;
-      if (World.collision) {
-        const halfH = ((o.scale && o.scale[1]) || 1) * 0.5;
-        if (m.position.y < halfH) { m.position.y = halfH; v[1] = 0; }
-      }
-    });
+  // ---- Shared impulse-based rigid-body physics ----
+  // Scripts drive the same body state the solver integrates, so a script's
+  // Rigidbody velocity and a thrown object behave identically.
+  const velocities = rbVelocities, spins = rbSpin;
+  const bodyPhysics = (function jN({THREE:e,meshes:t,data:n,world:r,velocities:i,spins:a={},geometry:o=AN(e)}){let s=new Map,c=[`cube`,`sphere`,`cylinder`,`cone`,`plane`,`model`],l=()=>new e.Vector3,u=1/120,d=0,f=e=>typeof e==`function`?e():e,p=(e,t,n)=>t.clone().applyQuaternion(e.q.clone().invert()).multiply(n?e.invI:e.I).applyQuaternion(e.q),m=e=>e.invMass?p(e,e.L,!0):e.w.clone(),h=(t,n)=>{let r=s.get(t.id);if(!r||r.mesh!==n){let e=o.localBounds(n);if(e.isEmpty())return null;r={mesh:n,bounds:e,center:e.getCenter(l()),size:e.getSize(l()),quiet:0,sleeping:!1},s.set(t.id,r)}n.updateWorldMatrix(!0,!0);let c=n.getWorldScale(l());r.half=r.size.clone().multiply(c).multiplyScalar(.5),r.half.set(Math.max(.001,Math.abs(r.half.x)),Math.max(.001,Math.abs(r.half.y)),Math.max(.001,Math.abs(r.half.z))),r.kind=t.type===`sphere`?`sphere`:`box`,r.radius=Math.max(r.half.x,r.half.y,r.half.z),r.kind===`sphere`&&r.half.setScalar(r.radius),r.p=n.localToWorld(r.center.clone()),r.q=n.getWorldQuaternion(new e.Quaternion),r.held=n.userData.grabbed===!0,r.collidable=t.collision!==!1,r.v=l().fromArray(i[t.id]||[0,0,0]),r.w=l().fromArray(a[t.id]||[0,0,0]);let u=r.v.lengthSq()>1e-8||r.w.lengthSq()>1e-8;r.dynamic=(t.physics===!0||u||r.held)&&t.type!==`plane`&&t._isKinematic!==!0,r.surfaceMesh=!r.dynamic&&t.type===`model`;let d=r.kind===`sphere`?4*Math.PI*r.radius**3/3:8*r.half.x*r.half.y*r.half.z,f=Math.max(.01,t._mass??t.mass??d);r.invMass=r.dynamic&&!r.held?1/f:0;let m=r.half;return r.I=r.kind===`sphere`?l().setScalar(.4*f*r.radius**2):l().set(f*(m.y**2+m.z**2)/3,f*(m.x**2+m.z**2)/3,f*(m.x**2+m.y**2)/3),r.invI=r.I.clone().set(1/r.I.x,1/r.I.y,1/r.I.z),r.invMass||r.invI.set(0,0,0),r.L=p(r,r.w,!1),r.gravity=t._useGravity!==!1,r.drag=t._drag??0,(n.userData.physicsWake||r.v.lengthSq()>1e-8||r.w.lengthSq()>1e-8||r.held)&&(r.sleeping=!1,r.quiet=0,n.userData.physicsWake=!1),r},g=(t,n)=>({p:t,half:n,q:new e.Quaternion,v:l(),w:l(),L:l(),invMass:0,invI:l(),kind:`box`,radius:n.length(),collidable:!0}),_=(e,t)=>e.v.clone().add(l().crossVectors(m(e),t.clone().sub(e.p))),v=(e,t,n)=>{if(!e.invMass)return 0;let r=l().crossVectors(t,n);return e.invMass+r.dot(p(e,r,!0))},y=(e,t,n)=>{e.invMass&&(e.v.addScaledVector(t,e.invMass),e.L.add(l().crossVectors(n.clone().sub(e.p),t)),t.lengthSq()>1e-4&&(e.sleeping=!1))},b=(t,n,r,i)=>{let a=n.gravity===!1||n.gravityObjects===!1?0:n.gravityStrength??9.8;for(let n of t){if(n.touching=!1,!n.invMass||n.sleeping)continue;n.gravity&&(n.v.y-=a*i),n.drag>0&&n.v.multiplyScalar(Math.exp(-n.drag*i)),n.p.addScaledVector(n.v,i);let t=m(n),r=t.length();r>1e-8&&n.q.premultiply(new e.Quaternion().setFromAxisAngle(t.divideScalar(r),r*i)).normalize()}let s=[],c=t.map(o.shape),u=(e,t,n)=>{if(!((!e.invMass||e.sleeping)&&(!t.invMass||t.sleeping)))for(let r of n){let n=_(e,r.point).sub(_(t,r.point)).dot(r.normal);s.push({...r,a:e,b:t,normalImpulse:0,frictionImpulse:l(),target:n<-.75?-n*.18:0}),e.touching=!0,t.touching=!0}};if(n.collision!==!1)for(let e=0;e<t.length;e++){let n=t[e];if(!(!n.collidable||!n.invMass)){for(let r=0;r<t.length;r++){let i=t[r];n===i||!i.collidable||i.invMass&&r<e||u(n,i,i.surfaceMesh?o.meshContacts(c[e],i.mesh):o.pair(c[e],c[r]))}if(!t.some(e=>e.mesh?.geometry?.type===`PlaneGeometry`&&e.collidable)){let t=g(l().set(0,-.01,0),l().set(1e5,.01,1e5));u(n,t,o.pair(c[e],o.shape(t)))}if(r&&r.radius>0){let t=g(l().set(r.x,(r.minY+r.maxY)*.5,r.z),l().set(r.radius,(r.maxY-r.minY)*.5,r.radius));u(n,t,o.pair(c[e],o.shape(t)))}}}for(let e=0;e<10;e++)for(let e of s){let{a:t,b:n,point:r,normal:i}=e,a=r.clone().sub(t.p),o=r.clone().sub(n.p),s=_(t,r).sub(_(n,r)),c=v(t,a,i)+v(n,o,i);if(c<1e-10)continue;let l=e.normalImpulse;e.normalImpulse=Math.max(0,l+(e.target-s.dot(i))/c);let u=i.clone().multiplyScalar(e.normalImpulse-l);y(t,u,r),y(n,u.clone().negate(),r),s=_(t,r).sub(_(n,r));let d=s.clone().addScaledVector(i,-s.dot(i)),f=d.length();if(f<1e-8)continue;d.divideScalar(f);let p=v(t,a,d)+v(n,o,d);if(p<1e-10)continue;let m=e.frictionImpulse.clone().addScaledVector(d,-f/p),h=.65*e.normalImpulse;m.length()>h&&m.setLength(h);let g=m.clone().sub(e.frictionImpulse);e.frictionImpulse.copy(m),y(t,g,r),y(n,g.clone().negate(),r)}let d=new Map;for(let e of s){let t=d.get(e.a)||[],n=t.find(t=>t.b===e.b&&t.normal.dot(e.normal)>.99);n?n.depth=Math.max(n.depth,e.depth):t.push({...e}),d.set(e.a,t);for(let t of[e.a,e.b])if(t.invMass&&e.normalImpulse>0){let n=m(t),r=n.length();if(r>1e-8){let i=Math.min(t.L.length(),.02*e.normalImpulse*Math.min(t.half.x,t.half.y,t.half.z));t.L.addScaledVector(n.divideScalar(r),-i)}}}for(let e of d.values())for(let t of e){let e=t.a.invMass+t.b.invMass;if(!e)continue;let n=Math.max(0,t.depth-5e-4)*.75/e;t.a.p.addScaledVector(t.normal,n*t.a.invMass),t.b.p.addScaledVector(t.normal,-n*t.b.invMass)}for(let e of t)!e.invMass||e.sleeping||(e.w.copy(m(e)),e.touching&&e.v.lengthSq()<.0025&&e.w.lengthSq()<.0064?e.quiet+=i:e.quiet=0,e.quiet>.4&&(e.sleeping=!0,e.v.set(0,0,0),e.w.set(0,0,0),e.L.set(0,0,0)))};return{update:(o,s=null)=>{if(!(o>0))return;let p=f(r)||{},m=f(n)||[],g=[];if(p.collision===!1){d=0;return}for(let e of m){let n=t[e.id];if(!c.includes(e.type)||e.vrRole||!n||e.type===`model`&&n.userData.loaded===!1)continue;let r=h(e,n);r&&(r.id=e.id,g.push(r))}if(!g.some(e=>e.invMass)){d=0;return}for(d+=Math.min(o,.1);d>=u;){let e=Math.max(1,...g.filter(e=>e.invMass&&!e.sleeping).map(e=>Math.ceil(e.v.length()*u/Math.max(.005,Math.min(e.half.x,e.half.y,e.half.z)*.5)))),t=Math.min(16,e);for(let e=0;e<t;e++)b(g,p,s,u/t);d-=u}for(let t of g){if(!t.invMass)continue;let n=t.mesh,r=n.getWorldScale(l()),o=t.p.clone().sub(t.center.clone().multiply(r).applyQuaternion(t.q)),s=t.q.clone();n.parent&&(n.parent.updateWorldMatrix(!0,!1),n.parent.worldToLocal(o),s.premultiply(n.parent.getWorldQuaternion(new e.Quaternion).invert())),n.position.copy(o),n.quaternion.copy(s).normalize(),n.updateWorldMatrix(!1,!0),i[t.id]=t.v.toArray(),a[t.id]=t.w.toArray()}}}})({ THREE, meshes, data: DATA, world: WORLD, velocities, spins, geometry: (function AN(e){let t=()=>new e.Vector3,n=new WeakMap,r=t=>{t.updateWorldMatrix(!0,!0);let n=t.matrixWorld.clone().invert(),r=new e.Box3;return t.traverse(e=>{!e.isMesh||!e.geometry||e.userData.grabOutline||(e.geometry.boundingBox||e.geometry.computeBoundingBox(),r.union(e.geometry.boundingBox.clone().applyMatrix4(n.clone().multiply(e.matrixWorld))))}),r},i=n=>{let r=[t().set(1,0,0),t().set(0,1,0),t().set(0,0,1)].map(e=>e.applyQuaternion(n.q)),i=[];for(let e of[-1,1])for(let t of[-1,1])for(let a of[-1,1])i.push(n.p.clone().addScaledVector(r[0],e*n.half.x).addScaledVector(r[1],t*n.half.y).addScaledVector(r[2],a*n.half.z));return{...n,axes:r,points:i,box:new e.Box3().setFromPoints(i)}},a=(e,t)=>e.kind===`sphere`?e.radius:Math.abs(t.dot(e.axes[0]))*e.half.x+Math.abs(t.dot(e.axes[1]))*e.half.y+Math.abs(t.dot(e.axes[2]))*e.half.z,o=(e,n)=>{if(e.kind===`sphere`)return e.p.clone().addScaledVector(n,e.radius);let r=Math.max(...e.points.map(e=>e.dot(n))),i=e.points.filter(e=>e.dot(n)>=r-.002);return i.reduce((e,t)=>e.add(t),t()).divideScalar(i.length)},s=(e,t,n=.003)=>{let r=t.clone().sub(e.p);return e.axes.every((t,i)=>Math.abs(r.dot(t))<=e.half.getComponent(i)+n)},c=(e,n)=>{let r=e.p.clone().sub(n.p),i=[...e.axes,...n.axes];for(let r of e.axes)for(let e of n.axes)i.push(t().crossVectors(r,e));let c=1/0,l=null;for(let t of i){if(t.lengthSq()<1e-10)continue;t.normalize();let i=a(e,t)+a(n,t)-Math.abs(r.dot(t));if(i<-.001)return[];i<c&&(c=Math.max(0,i),l=t.clone().multiplyScalar(r.dot(t)>=0?1:-1))}if(!l)return[];let u=[],d=o(n,l).dot(l),f=o(e,l.clone().negate()).dot(l);for(let t of e.points){if(t.dot(l)>d+.002)continue;let e=t.clone().addScaledVector(l,d-t.dot(l));s(n,e)&&u.push(e)}for(let t of n.points){if(t.dot(l)<f-.002)continue;let n=t.clone().addScaledVector(l,f-t.dot(l));s(e,n)&&u.push(n)}return u.length||u.push(o(e,l.clone().negate()).add(o(n,l)).multiplyScalar(.5)),u.filter((e,t)=>!u.slice(0,t).some(t=>t.distanceToSquared(e)<1e-6)).map(e=>({point:e,normal:l,depth:c}))},l=(t,n)=>{let r=t.p.clone().sub(n.p),i=n.p.clone(),a=n.axes.map(e=>r.dot(e));n.axes.forEach((t,r)=>i.addScaledVector(t,e.MathUtils.clamp(a[r],-n.half.getComponent(r),n.half.getComponent(r))));let o=t.p.clone().sub(i),s=o.length();if(s>t.radius+.001)return[];let c=t.radius-s;if(s>1e-8)o.divideScalar(s);else{let e=a.map((e,t)=>n.half.getComponent(t)-Math.abs(e)),r=e.indexOf(Math.min(...e));o.copy(n.axes[r]).multiplyScalar(a[r]>=0?1:-1),c=t.radius+e[r],i.copy(t.p).addScaledVector(o,e[r])}return[{point:i,normal:o,depth:Math.max(0,c)}]},u=(e,t)=>{if(!e.box.clone().expandByScalar(.002).intersectsBox(t.box))return[];if(e.kind===`sphere`&&t.kind===`sphere`){let n=e.p.clone().sub(t.p),r=n.length(),i=e.radius+t.radius-r;return i<-.001?[]:(r>1e-8?n.divideScalar(r):n.set(0,1,0),[{point:e.p.clone().addScaledVector(n,-e.radius),normal:n,depth:Math.max(0,i)}])}return e.kind===`sphere`?l(e,t):t.kind===`sphere`?l(t,e).map(e=>({...e,normal:e.normal.negate()})):c(e,t)},d=r=>{let i=n.get(r);if(i)return i;let a=r.attributes.position,o=r.index;i=[];for(let n=0,r=o?o.count:a.count;n+2<r;n+=3){let r=[0,1,2].map(e=>t().fromBufferAttribute(a,o?o.getX(n+e):n+e));i.push(new e.Triangle(...r))}return n.set(r,i),i};return{localBounds:r,shape:i,pair:u,meshContacts:(n,r)=>{let i=[],s=new e.Box3,c=n.box.clone().expandByScalar(.003);return r.updateWorldMatrix(!0,!0),r.traverse(r=>{if(!(!r.isMesh||!r.geometry?.attributes.position||r.userData.grabOutline)&&(r.geometry.boundingBox||r.geometry.computeBoundingBox(),c.intersectsBox(r.geometry.boundingBox.clone().applyMatrix4(r.matrixWorld))))for(let l of d(r.geometry)){let u=new e.Triangle(...[l.a,l.b,l.c].map(e=>e.clone().applyMatrix4(r.matrixWorld)));if(s.setFromPoints([u.a,u.b,u.c]),!c.intersectsBox(s))continue;if(n.kind===`sphere`){let e=u.closestPointToPoint(n.p,t()),r=n.p.clone().sub(e),a=r.length();a<=n.radius+.001&&(a>1e-8?r.divideScalar(a):u.getNormal(r),i.push({point:e,normal:r,depth:Math.max(0,n.radius-a)}));continue}let d=u.getNormal(t()),f=n.p.clone().sub(u.a).dot(d);f<0&&d.negate();let p=a(n,d)-Math.abs(f);if(p<-.001)continue;let m=[u.b.clone().sub(u.a),u.c.clone().sub(u.b),u.a.clone().sub(u.c)],h=[...n.axes];for(let e of m)for(let r of n.axes)h.push(t().crossVectors(e,r));if(h.some(e=>{if(e.lengthSq()<1e-10)return!1;e.normalize();let t=n.p.dot(e),r=a(n,e),i=[u.a,u.b,u.c].map(t=>t.dot(e));return Math.max(...i)<t-r-.001||Math.min(...i)>t+r+.001}))continue;let g=!1;for(let e of n.points){let t=e.clone().sub(u.a).dot(d);if(t>.002)continue;let n=e.clone().addScaledVector(d,-t);u.containsPoint(n)&&(i.push({point:n,normal:d.clone(),depth:Math.max(0,-t)}),g=!0)}g||i.push({point:u.closestPointToPoint(o(n,d.clone().negate()),t()),normal:d,depth:Math.max(0,p)})}}),i.filter((e,t)=>!i.slice(0,t).some(t=>t.point.distanceToSquared(e.point)<1e-6&&t.normal.dot(e.normal)>.99))}}})(THREE) });
+  const grab = (function ON({THREE:e,scene:t,rig:n,meshes:r,data:i,rigObj:a,input:o,velocities:s,spins:c,surface:l=DN(e)}){let u={a:`aButton`,b:`bButton`,x:`xButton`,y:`yButton`,grip:`grip`,trigger:`trigger`,thumbstick:`thumbstickDown`},d={left:null,right:null},f={left:!1,right:!1},p=new Map,m=new Map,h=new e.Box3,g=new e.Vector3,_=new e.Vector3,v=new e.Matrix4,y=new e.Matrix4,b=new e.Matrix4,x=new e.Vector3,S=new e.Quaternion,C=new e.Vector3,w=new e.Vector3,T=new e.Quaternion,E=new e.Vector3,D={left:new e.Vector3,right:new e.Vector3},O={left:new e.Vector3,right:new e.Vector3},k={left:!1,right:!1},A=new e.Vector3,j=new e.Vector3,M={left:new e.Vector3,right:new e.Vector3},N={left:new e.Quaternion,right:new e.Quaternion},P=new e.Quaternion,F=new e.Quaternion,I=new e.Vector3,L=()=>(typeof i==`function`?i():i)||[],R=()=>(typeof n==`function`?n():n)||{},ee=()=>(typeof a==`function`?a():a)||null,te=e=>R()[e===`left`?`leftHand`:`rightHand`]||null,ne=e=>o&&(e===`left`?o.leftHand:o.rightHand)||null,re=e=>{let t=ee();return t?e===`left`?t.grabLeft!==!1:t.grabRight!==!1:!1},ie=e=>{let t=ee()||{},n=e===`left`?t.leftGrabButton:t.rightGrabButton;return u[String(n||`grip`).split(`-`).pop()]||`grip`},ae=e=>e.grabable===!0&&!e.vrRole&&r[e.id]&&(e.type!==`model`||r[e.id].userData.loaded===!0),oe=(e,t)=>{s&&(s[e]=t)},se=(e,t)=>{c&&(c[e]=t)},ce=(e,t)=>{let n=r[e.id];t.updateWorldMatrix(!0,!1),n.updateWorldMatrix(!0,!0),t.getWorldPosition(A);let i=l(n,A),a=n.matrixWorld.clone();if(i){let e=A.clone().sub(i.point).addScaledVector(i.normal,-.02);a.elements[12]+=e.x,a.elements[13]+=e.y,a.elements[14]+=e.z}return t.matrixWorld.clone().invert().multiply(a)},le=n=>{let i=r[n.id],a=`${n.grabOutlineColor||`#4fa3e8`}|${n.grabOutlineThickness??.03}`,o=p.get(n.id);if(o&&o.key===a)return o;o&&(t.remove(o.group),o.material.dispose());let s=new e.MeshBasicMaterial({color:n.grabOutlineColor||`#4fa3e8`,side:e.BackSide,depthWrite:!1}),c=new e.Group;return c.userData.grabOutline=!0,i.updateWorldMatrix(!0,!1),b.copy(i.matrixWorld).invert(),i.traverse(t=>{if(!t.isMesh||t.userData.grabOutline)return;t.updateWorldMatrix(!0,!1);let n=new e.Mesh(t.geometry,s);n.matrix.multiplyMatrices(b,t.matrixWorld),n.matrix.decompose(n.position,n.quaternion,n.scale),n.userData.grabOutline=!0,n.castShadow=!1,n.receiveShadow=!1,c.add(n)}),o={group:c,material:s,key:a},c.visible=!1,t.add(c),p.set(n.id,o),o},z=(e,t)=>{let n=r[t.id];n.updateWorldMatrix(!0,!1),n.matrixWorld.decompose(x,S,C),h.setFromObject(n),h.getSize(g);let i=Math.max(0,t.grabOutlineThickness??.03);e.group.position.copy(x),e.group.quaternion.copy(S),e.group.scale.set(C.x*(1+2*i/Math.max(g.x,.001)),C.y*(1+2*i/Math.max(g.y,.001)),C.z*(1+2*i/Math.max(g.z,.001)))},ue=e=>{e.updateWorldMatrix(!0,!1),e.getWorldPosition(_);let t=null,n=1/0;for(let e of L()){if(!ae(e)||d.left?.id===e.id||d.right?.id===e.id)continue;let i=r[e.id];if(h.setFromObject(i),h.isEmpty())continue;let a=Math.min(Math.max(_.x,h.min.x),h.max.x)-_.x,o=Math.min(Math.max(_.y,h.min.y),h.max.y)-_.y,s=Math.min(Math.max(_.z,h.min.z),h.max.z)-_.z,c=Math.hypot(a,o,s);c<=(e.grabRange??1.5)&&c<n&&(n=c,t=e)}return t},de=(e,t,n)=>{let i=r[t.id];n.updateWorldMatrix(!0,!1),i.updateWorldMatrix(!0,!1);let a=t.grabToHand===!0?ce(t,n):y.copy(n.matrixWorld).invert().multiply(i.matrixWorld).clone();d[e]={id:t.id,offset:a,mode:t.grabMode===`toggle`?`toggle`:`hold`},i.userData.grabbed=!0,i.userData.physicsReleased=!0,i.userData.physicsWake=!0,oe(t.id,[0,0,0]),se(t.id,[0,0,0])},fe=(t,n)=>{let i=d[t];if(!i)return;d[t]=null;let a=r[i.id];a&&(a.userData.grabbed=!1);let o=L().find(e=>e.id===i.id);if(a&&(a.userData.physicsWake=!0),n&&a&&o?.physics===!0){a.updateWorldMatrix(!0,!0);let n=new e.Box3().setFromObject(a).getCenter(new e.Vector3).sub(O[t]),r=D[t].clone().add(new e.Vector3().crossVectors(M[t],n));oe(i.id,r.toArray()),se(i.id,M[t].toArray())}else oe(i.id,[0,0,0]),se(i.id,[0,0,0])},B=(e,t,n)=>{t.updateWorldMatrix(!0,!1);let r=n>0?1-Math.exp(-n/.025):0;if(t.getWorldPosition(A),t.getWorldQuaternion(P),k[e]&&n>0){j.subVectors(A,O[e]).divideScalar(n),D[e].lerp(j,r),F.copy(N[e]).invert().premultiply(P),F.w<0&&F.set(-F.x,-F.y,-F.z,-F.w);let t=Math.sqrt(Math.max(0,1-F.w*F.w));if(t>1e-5){let e=2*Math.atan2(t,F.w);I.set(F.x/t*e/n,F.y/t*e/n,F.z/t*e/n)}else I.set(0,0,0);M[e].lerp(I,r)}else k[e]=!0,D[e].set(0,0,0),M[e].set(0,0,0);O[e].copy(A),N[e].copy(P)},pe=(e,t)=>{let n=d[e],i=r[n.id];if(!i){fe(e,!1);return}t.updateWorldMatrix(!0,!1),v.multiplyMatrices(t.matrixWorld,n.offset),i.parent?(i.parent.updateWorldMatrix(!0,!1),y.copy(i.parent.matrixWorld).invert().multiply(v)):y.copy(v),y.decompose(w,T,E),i.position.copy(w),i.quaternion.copy(T),i.scale.copy(E)},me=()=>{fe(`left`,!1),fe(`right`,!1),f.left=!1,f.right=!1,k.left=!1,k.right=!1,m.clear(),p.forEach(e=>{e.group.visible=!1})};return{update:(e=0)=>{if(!o||!o.present||!ee()){me();return}m.clear(),[`left`,`right`].forEach(t=>{let n=ne(t),r=te(t);if(!re(t)||!n||!n.tracked||!r){fe(t,!1),f[t]=!1,k[t]=!1;return}B(t,r,e),d[t]&&pe(t,r);let i=!!n[ie(t)],a=d[t];if(i&&!f[t])if(a)a.mode===`toggle`&&fe(t,!0);else{let e=ue(r);e&&de(t,e,r)}else!i&&a&&a.mode===`hold`&&fe(t,!0);if(f[t]=i,d[t])pe(t,r,e);else{let e=ue(r);e&&m.set(e.id,e)}}),m.forEach((e,t)=>{if(e.grabOutline===!1)return;let n=le(e);n.group.visible=!0,z(n,e)}),p.forEach((e,t)=>{let n=m.get(t);(!n||n.grabOutline===!1)&&(e.group.visible=!1)})},releaseAll:me,dispose:()=>{me(),p.forEach(e=>{t.remove(e.group),e.material.dispose()}),p.clear()}}})({ THREE, scene, rig, meshes, data: DATA, rigObj, input: vrInput, velocities, spins, surface: (function DN(e){let t=new e.Triangle,n=new e.Vector3,r=new e.Vector3,i=new e.Matrix3;return(e,a)=>{e.updateWorldMatrix(!0,!0);let o=1/0,s=null;return e.traverse(e=>{let c=e.geometry;if(!e.isMesh||!e.visible||e.userData.grabOutline||!c?.attributes.position)return;let l=c.attributes.position,u=c.index,d=u?u.count:l.count;i.getNormalMatrix(e.matrixWorld);for(let c=0;c+2<d;c+=3){for(let n=0;n<3;n++){let r=n===0?t.a:n===1?t.b:t.c,i=u?u.getX(c+n):c+n;e.isSkinnedMesh?e.getVertexPosition(i,r):r.fromBufferAttribute(l,i)}t.getNormal(r).applyMatrix3(i).normalize(),t.a.applyMatrix4(e.matrixWorld),t.b.applyMatrix4(e.matrixWorld),t.c.applyMatrix4(e.matrixWorld),t.closestPointToPoint(a,n);let d=n.distanceToSquared(a);d<o&&(o=d,s={point:n.clone(),normal:r.clone()})}}),s}})(THREE) });
+  function playerCollider() {
+    if (!rig.head || !vrInput.present) return null;
+    const p = new THREE.Vector3(); rig.head.getWorldPosition(p);
+    const height = rigObj ? (rigObj.playerHeight ?? 1.6) : 1.6;
+    return { x: p.x, z: p.z, radius: 0.35, minY: p.y - height, maxY: p.y + 0.15 };
   }
+  function stepPhysics(dt) { bodyPhysics.update(dt, playerCollider()); }
 
   let vrActive = false;
   const halfIPD = 0.032;
@@ -1218,7 +951,6 @@ function init() {
     if (true && !vrInput.present) return;
     var ts = (entries[0] && entries[0].Time.timeScale) || 1; var sdt = dt * ts;
     entries.forEach((e) => { e.Time.delta = sdt; e.Time.elapsed = el; try { e.onUpdate && e.onUpdate(); } catch (err) { console.error(err); } });
-    Object.keys(rbVelocities).forEach(function(id) { if (id.endsWith('_ang')) return; var mesh = meshes[id]; if (!mesh) return; var od = DATA.find(function(o) { return o.id === id; }); if (!od || od._isKinematic || od._sleeping) return; var v = rbVelocities[id]; if (od._useGravity !== false) v[1] -= 9.8 * sdt; mesh.position.x += v[0] * sdt; mesh.position.y += v[1] * sdt; mesh.position.z += v[2] * sdt; if (mesh.position.y < 0) { mesh.position.y = 0; v[1] = Math.abs(v[1]) * 0.3; } var drag = (od._drag != null) ? od._drag : 0.01; v[0] *= (1 - drag); v[2] *= (1 - drag); if (Math.abs(v[0]) < 0.001) v[0] = 0; if (Math.abs(v[2]) < 0.001) v[2] = 0; });
     for (var k in Input.keysPressed) delete Input.keysPressed[k];
     for (var k in Input.keysReleased) delete Input.keysReleased[k];
     for (var k in Input.mouseButtonsPressed) delete Input.mouseButtonsPressed[k];
@@ -1227,7 +959,7 @@ function init() {
     vrInput.leftHand.gripDown = false; vrInput.leftHand.gripUp = false; vrInput.leftHand.triggerDown = false; vrInput.leftHand.triggerUp = false;
     vrInput.rightHand.gripDown = false; vrInput.rightHand.gripUp = false; vrInput.rightHand.triggerDown = false; vrInput.rightHand.triggerUp = false;
     entries.forEach(function(e) { e.Time.time = el; e.Time.timeSinceLevelLoad = el; e.Time.unscaledTime = el; e.Time.unscaledDeltaTime = dt; e.Time.fixedTime = el; e.Time.smoothDeltaTime = dt; e.Time.frameCount++; e.Time.renderedFrameCount++; e.Time.realtimeSinceStartup = el; });
-    if (animations) Object.keys(animations).forEach(function(id) { animations[id].update(dt); });
+    if (animations) Object.keys(animations).forEach(function(id) { var m = meshes[id]; if (m && (m.userData.grabbed || m.userData.physicsReleased)) return; animations[id].update(dt); });
     stepPhysics(dt);
     if (skyMesh) {
       if (renderer.xr.isPresenting) { skyMesh.position.setFromMatrixPosition(renderer.xr.getCamera().matrixWorld); }
@@ -1236,6 +968,9 @@ function init() {
     }
     if (renderer.xr.isPresenting) {
       xrRuntime.sync();
+      // Grabbing runs after the hands are placed so a held object tracks the
+      // hand exactly.
+      grab.update(dt);
       renderer.render(scene, camera);
     } else if (vrActive) {
       camera.rotation.set(pitch, rigYaw, roll, 'YXZ');
@@ -1249,188 +984,14 @@ function init() {
       renderer.render(scene, rightCam);
       renderer.setScissorTest(false);
     } else {
+      // Flat view — anything held when the session ended is let go.
+      grab.releaseAll();
       camera.rotation.set(pitch, rigYaw, roll, 'YXZ');
       renderer.render(scene, camera);
     }
   });
 
-  (function configureWebSceneVr({ THREE, renderer, scene, rig, rigObj, btn, exitBtn, xrRuntime, onSessionChange, onError }) {
-  let session = null, requesting = false, supported = null, retryTimer = null, autoAttempts = 0, pendingOffer = null;
-  const MAX_AUTO_ATTEMPTS = 12;
-  const parts = ['head', 'body', 'leftHand', 'rightHand'].map(role => rig[role]).filter(Boolean)
-    .map(node => ({ node, parent: node.parent, position: node.position.clone(), quaternion: node.quaternion.clone(), scale: node.scale.clone() }));
-
-  const gate = document.createElement('div');
-  gate.style.cssText = 'position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;background:#0a0c12;color:#e6e6e6;font:15px/1.6 ui-monospace,monospace;';
-  const heading = document.createElement('div');
-  heading.textContent = 'VR required';
-  heading.style.cssText = 'font-size:24px;font-weight:700;letter-spacing:0.08em;';
-  const status = document.createElement('div');
-  status.style.cssText = 'max-width:560px;color:#9aa4b2;';
-  const gateBtn = document.createElement('button');
-  gateBtn.textContent = 'Enter VR';
-  gateBtn.style.cssText = 'padding:16px 36px;font:16px ui-monospace,monospace;font-weight:700;background:#2196f3;color:#fff;border:none;border-radius:12px;cursor:pointer;';
-  gate.append(heading, status, gateBtn);
-  document.body.appendChild(gate);
-  btn.style.display = 'none';
-  exitBtn.style.display = 'none';
-
-  const showGate = (message, label, disabled) => {
-    status.textContent = message;
-    gateBtn.textContent = label;
-    gateBtn.disabled = Boolean(disabled);
-    gate.style.display = 'flex';
-    btn.style.display = 'none';
-  };
-
-  // Ending VR returns the visitor to the gate instead of leaving a flat scene open.
-  const restore = () => {
-    parts.forEach(({ node, parent, position, quaternion, scale }) => {
-      if (parent) parent.add(node);
-      node.position.copy(position); node.quaternion.copy(quaternion); node.scale.copy(scale);
-    });
-    xrRuntime.stop();
-    if (rig.head) rig.head.visible = true;
-    onSessionChange(false);
-    exitBtn.style.display = 'none';
-    showGate('This scene runs in VR only. Move a controller or touch the screen to step back in.', 'Enter VR', false);
-  };
-
-  async function enterVR(automatic, offeredSession) {
-    if (requesting || session || supported === false || !navigator.xr) {
-      if (offeredSession && offeredSession !== session) {
-        if (requesting && !session && supported !== false) pendingOffer = offeredSession;
-        else offeredSession.end().catch(onError);
-      }
-      return;
-    }
-    requesting = true; gateBtn.disabled = true; gateBtn.textContent = 'Starting VR…';
-    let created = null, ended = false;
-    try {
-      // Call before any await so a tap's user activation is preserved.
-      created = offeredSession || await navigator.xr.requestSession('immersive-vr', { requiredFeatures: ['local'], optionalFeatures: ['local-floor', 'hand-tracking'] });
-      session = created;
-      created.addEventListener('end', () => {
-        ended = true;
-        if (session === created) { session = null; restore(); }
-      }, { once: true });
-      let referenceType = 'local';
-      try { await created.requestReferenceSpace('local-floor'); referenceType = 'local-floor'; }
-      catch (error) { if (error.name !== 'NotSupportedError') throw error; }
-      if (ended) return;
-      renderer.xr.setReferenceSpaceType(referenceType);
-      await renderer.xr.setSession(created);
-      if (ended) return;
-      const base = renderer.xr.getReferenceSpace();
-      xrRuntime.start(base, referenceType === 'local-floor');
-      if (rigObj && base) {
-        const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, rigObj.rotation?.[1] || 0, 0)).invert();
-        const p = new THREE.Vector3().fromArray(rigObj.position || [0, 0, 0]).applyQuaternion(q).negate();
-        renderer.xr.setReferenceSpace(base.getOffsetReferenceSpace(new XRRigidTransform(
-          { x: p.x, y: p.y, z: p.z }, { x: q.x, y: q.y, z: q.z, w: q.w }
-        )));
-      }
-      parts.forEach(({ node }) => scene.attach(node));
-      onSessionChange(true);
-      if (retryTimer) { clearTimeout(retryTimer); retryTimer = null; }
-      gate.style.display = 'none';
-      exitBtn.style.display = 'block';
-    } catch (error) {
-      // Release a partially initialized session; never disguise a failure as stereo VR.
-      if (created && !ended) {
-        try { await created.end(); } catch (endError) { onError(endError); }
-      }
-      if (session === created) session = null;
-      restore();
-      if (automatic && ['SecurityError', 'NotAllowedError'].includes(error.name)) {
-        // Browsers that demand a gesture: keep trying on a timer, and start VR on
-        // the visitor's first touch, click or key press wherever it lands.
-        showGate('Entering Immersive VR… move a controller or touch the screen if it does not start on its own.', 'Enter VR', false);
-        retryLater();
-      } else {
-        showGate('Could not start VR: ' + (error.message || error), 'Retry Immersive VR', false);
-        onError('Could not enter VR: ' + (error.message || error));
-        if (automatic) retryLater();
-      }
-    } finally {
-      requesting = false;
-      gateBtn.disabled = supported === false;
-      if (pendingOffer) {
-        const offered = pendingOffer; pendingOffer = null;
-        enterVR(true, offered);
-      }
-    }
-  }
-
-  // VR is automatic: the page opens its own headset session as soon as the
-  // browser permits it, keeps retrying while the headset wakes up, and treats the
-  // first touch, click or key press as the gesture some browsers still demand —
-  // so the visitor never has to hunt for a button.
-  const auto = () => {
-    if (session || requesting || supported === false || autoAttempts >= MAX_AUTO_ATTEMPTS) return;
-    autoAttempts++;
-    enterVR(true);
-  };
-  const retryLater = () => {
-    if (retryTimer || session || supported !== true || autoAttempts >= MAX_AUTO_ATTEMPTS) return;
-    retryTimer = setTimeout(() => { retryTimer = null; auto(); }, 900 * autoAttempts);
-  };
-  const firstGesture = event => {
-    if (event.target === exitBtn) return;
-    if (!session && supported !== false) enterVR(false);
-  };
-  gateBtn.onclick = () => enterVR(false);
-  ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(type => window.addEventListener(type, firstGesture, { capture: true, passive: type !== 'keydown' }));
-  // Headset wake-up, returning to the page, or a granted session all re-attempt.
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') auto(); });
-  window.addEventListener('focus', auto);
-  const onGranted = () => { supported = true; autoAttempts = 0; enterVR(true); };
-  const launch = window.__vrunityXrLaunch;
-  if (launch) launch.onGranted = onGranted;
-  else if (navigator.xr) navigator.xr.addEventListener('sessiongranted', onGranted);
-
-  exitBtn.onclick = async event => {
-    event.stopPropagation();
-    if (session) {
-      try { await session.end(); } catch (error) { onError('Could not leave VR: ' + error.message); }
-    }
-  };
-
-  if (!navigator.xr || !window.isSecureContext) {
-    supported = false;
-    showGate('This scene runs in VR only. Open the link in a WebXR headset browser — for example the browser inside your headset.', 'VR not available in this browser', true);
-    return;
-  }
-  renderer.xr.setReferenceSpaceType('local');
-  // Lower XR framebuffer cost without resizing the canvas during a live session.
-  renderer.xr.setFramebufferScaleFactor(0.85);
-  renderer.xr.setFoveation(1);
-  showGate('Opening Immersive VR…', 'Starting VR…', true);
-  // Do not wait for the asynchronous support check before requesting entry.
-  // A headset's navigation grant can arrive before the engine is ready.
-  if (launch?.granted) onGranted();
-  else auto();
-  if (typeof navigator.xr.offerSession === 'function') {
-    // Let the browser launch directly into VR when it supports offered sessions.
-    // An outstanding offer must not block the manual entry fallback.
-    navigator.xr.offerSession('immersive-vr', { requiredFeatures: ['local'], optionalFeatures: ['local-floor', 'hand-tracking'] })
-      .then(offered => enterVR(true, offered))
-      .catch(() => {}); // Entry via requestSession remains available.
-  }
-  navigator.xr.isSessionSupported('immersive-vr').then(ok => {
-    supported = ok;
-    if (session || requesting) return;
-    if (!ok) {
-      showGate('This scene runs in VR only, and this browser does not support Immersive VR. Open the link in your headset browser.', 'VR not supported here', true);
-      return;
-    }
-    showGate('This scene runs in VR only — entering Immersive VR automatically. Move a controller or touch the screen if it does not start on its own.', 'Enter VR', false);
-    auto();
-  }).catch(error => {
-    showGate('Could not check VR support: ' + error.message, 'Retry Immersive VR', false);
-    onError('Could not check VR: ' + error.message);
-  });
-})({ THREE, renderer, scene, rig, rigObj, btn, exitBtn, xrRuntime, onSessionChange: function(value) { vrActive = value; }, onError: showSceneError });
+  (function xN({THREE:e,renderer:t,scene:n,rig:r,rigObj:i,btn:a,exitBtn:o,xrRuntime:s,onSessionChange:c,onError:l}){let u=null,d=!1,f=null,p=null,m=0,h=null,g=(e,t)=>new Promise((n,r)=>{let i=setTimeout(()=>{t&&e.then(t,()=>{}),r(Object.assign(Error(`the headset did not answer`),{name:`TimeoutError`}))},1e4);e.then(e=>{clearTimeout(i),n(e)},e=>{clearTimeout(i),r(e)})}),_=[`head`,`body`,`leftHand`,`rightHand`].map(e=>r[e]).filter(Boolean).map(e=>({node:e,parent:e.parent,position:e.position.clone(),quaternion:e.quaternion.clone(),scale:e.scale.clone()})),v=document.createElement(`div`);v.style.cssText=`position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;background:#0a0c12;color:#e6e6e6;font:15px/1.6 ui-monospace,monospace;`;let y=document.createElement(`div`);y.textContent=`VR required`,y.style.cssText=`font-size:24px;font-weight:700;letter-spacing:0.08em;`;let b=document.createElement(`div`);b.style.cssText=`max-width:560px;color:#9aa4b2;`;let x=document.createElement(`button`);x.textContent=`Enter VR`,x.style.cssText=`padding:16px 36px;font:16px ui-monospace,monospace;font-weight:700;background:#2196f3;color:#fff;border:none;border-radius:12px;cursor:pointer;`,v.append(y,b,x),document.body.appendChild(v),a.style.display=`none`,o.style.display=`none`;let S=(e,t,n)=>{b.textContent=e,x.textContent=t,x.disabled=!!n,v.style.display=`flex`,a.style.display=`none`},C=()=>{_.forEach(({node:e,parent:t,position:n,quaternion:r,scale:i})=>{t&&t.add(e),e.position.copy(n),e.quaternion.copy(r),e.scale.copy(i)}),s.stop(),r.head&&(r.head.visible=!0),c(!1),o.style.display=`none`,S(`This scene runs in VR only. Move a controller or touch the screen to step back in.`,`Enter VR`,!1)};async function w(r,a){if(d||u||f===!1||!navigator.xr){a&&a!==u&&(d&&!u&&f!==!1?h=a:a.end().catch(l));return}d=!0,x.disabled=!1,x.textContent=`Enter VR`,b.textContent=`Waiting for your headset to answer…`;let m=null,y=!1;try{let r=a?null:navigator.xr.requestSession(`immersive-vr`,{requiredFeatures:[`local`],optionalFeatures:[`local-floor`,`hand-tracking`]});m=a||await g(r,e=>{if(e)try{e.end()}catch{}}),u=m,m.addEventListener(`end`,()=>{y=!0,u===m&&(u=null,C())},{once:!0});let l=`local`;try{await m.requestReferenceSpace(`local-floor`),l=`local-floor`}catch(e){if(e.name!==`NotSupportedError`)throw e}if(y||(t.xr.setReferenceSpaceType(l),await t.xr.setSession(m),y))return;let d=t.xr.getReferenceSpace();if(s.start(d,l===`local-floor`),i&&d){let n=new e.Quaternion().setFromEuler(new e.Euler(0,i.rotation?.[1]||0,0)).invert(),r=new e.Vector3().fromArray(i.position||[0,0,0]).applyQuaternion(n).negate();t.xr.setReferenceSpace(d.getOffsetReferenceSpace(new XRRigidTransform({x:r.x,y:r.y,z:r.z},{x:n.x,y:n.y,z:n.z,w:n.w})))}_.forEach(({node:e})=>n.attach(e)),c(!0),p&&=(clearTimeout(p),null),v.style.display=`none`,o.style.display=`block`}catch(e){if(m&&!y)try{await m.end()}catch(e){l(e)}u===m&&(u=null),C(),e.name===`TimeoutError`?(S(`Your headset did not answer. Check that it is awake with its VR runtime running, then tap Enter VR.`,`Enter VR`,!1),E()):r&&[`SecurityError`,`NotAllowedError`].includes(e.name)?(S(`Entering Immersive VR… move a controller or touch the screen if it does not start on its own.`,`Enter VR`,!1),E()):(S(`Could not start VR: `+(e.message||e),`Retry Immersive VR`,!1),l(`Could not enter VR: `+(e.message||e)),r&&E())}finally{if(d=!1,x.disabled=f===!1,h){let e=h;h=null,w(!0,e)}}}let T=()=>{u||d||f===!1||m>=12||(m++,w(!0))},E=()=>{p||u||f!==!0||m>=12||(p=setTimeout(()=>{p=null,T()},900*m))},D=e=>{e.target!==o&&!u&&f!==!1&&w(!1)};x.onclick=()=>w(!1),[`pointerdown`,`touchstart`,`click`,`keydown`].forEach(e=>window.addEventListener(e,D,{capture:!0,passive:e!==`keydown`})),document.addEventListener(`visibilitychange`,()=>{document.visibilityState===`visible`&&T()}),window.addEventListener(`focus`,T);let O=()=>{f=!0,m=0,w(!0)},k=window.__vrunityXrLaunch;if(k?k.onGranted=O:navigator.xr&&navigator.xr.addEventListener(`sessiongranted`,O),o.onclick=async e=>{if(e.stopPropagation(),u)try{await u.end()}catch(e){l(`Could not leave VR: `+e.message)}},!navigator.xr||!window.isSecureContext){f=!1,S(`This scene runs in VR only. Open the link in a WebXR headset browser — for example the browser inside your headset.`,`VR not available in this browser`,!0);return}t.xr.setReferenceSpaceType(`local`),t.xr.setFramebufferScaleFactor(.85),t.xr.setFoveation(1),S(`Looking for your headset — Immersive VR starts on its own as soon as the headset answers. Tap Enter VR if it does not.`,`Enter VR`,!1),k?.granted?O():T(),typeof navigator.xr.offerSession==`function`&&navigator.xr.offerSession(`immersive-vr`,{requiredFeatures:[`local`],optionalFeatures:[`local-floor`,`hand-tracking`]}).then(e=>w(!0,e)).catch(()=>{}),navigator.xr.isSessionSupported(`immersive-vr`).then(e=>{if(f=e,!(u||d)){if(!e){S(`This scene runs in VR only, and this browser does not support Immersive VR. Open the link in your headset browser.`,`VR not supported here`,!0);return}S(`This scene runs in VR only — entering Immersive VR automatically. Move a controller or touch the screen if it does not start on its own.`,`Enter VR`,!1),T()}}).catch(e=>{S(`Could not check VR support: `+e.message,`Retry Immersive VR`,!1),l(`Could not check VR: `+e.message)})})({ THREE, renderer, scene, rig, rigObj, btn, exitBtn, xrRuntime, onSessionChange: function(value) { vrActive = value; }, onError: showSceneError });
   addEventListener('resize', () => {
     if (renderer.xr.isPresenting) return;
     camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight);
